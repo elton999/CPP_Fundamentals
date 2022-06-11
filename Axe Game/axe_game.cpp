@@ -28,27 +28,35 @@ int main(void)
 
     while (!WindowShouldClose())
     {
+        // update the edges
+        l_circle_x = circle_position.x - circle_radios;
+        r_circle_x = circle_position.x + circle_radios;
+        u_circle_y = circle_position.y - circle_radios;
+        b_circle_y = circle_position.y + circle_radios;
+
+        l_axe_x = axe_position.x;
+        r_axe_x = axe_position.x + axe_size.x;
+        u_axe_y = axe_position.y;
+        b_axe_y = axe_position.y + axe_size.y;
+
         bool collision_with_axe = b_axe_y >= u_circle_y && u_axe_y <= b_circle_y && l_axe_x <= r_circle_x && r_axe_x >= l_circle_x;
 
         BeginDrawing();
         ClearBackground(WHITE);
 
         if (collision_with_axe)
+        {
             DrawText("Game Over!", 350, 200, 20, RED);
+            if (IsKeyDown(KEY_SPACE))
+            {
+                collision_with_axe = false;
+                circle_position = Vector2{200.0, 200.0};
+                axe_position = Vector2{300.0, 0};
+            }
+        }
         else
         {
             // Game logic begins
-
-            // update the edges
-            l_circle_x = circle_position.x - circle_radios;
-            r_circle_x = circle_position.x + circle_radios;
-            u_circle_y = circle_position.y - circle_radios;
-            b_circle_y = circle_position.y + circle_radios;
-
-            l_axe_x = axe_position.x;
-            r_axe_x = axe_position.x + axe_size.x;
-            u_axe_y = axe_position.y;
-            b_axe_y = axe_position.y + axe_size.y;
 
             DrawCircleV(circle_position, circle_radios, BLUE);
             DrawRectangleV(axe_position, axe_size, RED);
