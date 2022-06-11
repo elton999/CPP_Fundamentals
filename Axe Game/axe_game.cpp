@@ -23,13 +23,13 @@ int main(void)
 
     int direction{10};
 
-    bool collision_with_axe{true};
-
     InitWindow(width, height, "Axe Game");
     SetTargetFPS(60);
 
     while (!WindowShouldClose())
     {
+        bool collision_with_axe = b_axe_y >= u_circle_y && u_axe_y <= b_circle_y && l_axe_x <= r_circle_x && r_axe_x >= l_circle_x;
+
         BeginDrawing();
         ClearBackground(WHITE);
 
@@ -38,6 +38,17 @@ int main(void)
         else
         {
             // Game logic begins
+
+            // update the edges
+            l_circle_x = circle_position.x - circle_radios;
+            r_circle_x = circle_position.x + circle_radios;
+            u_circle_y = circle_position.y - circle_radios;
+            b_circle_y = circle_position.y + circle_radios;
+
+            l_axe_x = axe_position.x;
+            r_axe_x = axe_position.x + axe_size.x;
+            u_axe_y = axe_position.y;
+            b_axe_y = axe_position.y + axe_size.y;
 
             DrawCircleV(circle_position, circle_radios, BLUE);
             DrawRectangleV(axe_position, axe_size, RED);
