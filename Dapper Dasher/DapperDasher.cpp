@@ -17,17 +17,34 @@ int main(void)
     scarfyPos.x = windowWidth / 2 - scarfyRec.width / 2;
     scarfyPos.y = windowHeight - scarfyRec.height;
 
-    const int gravity{1};
+    const int gravity{1000};
 
     int velocity{0};
-    int jumpVelocity{-21};
+    int jumpVelocity{-600};
 
     bool isInAir{false};
+
+    int frame{0};
+    float updateTime{1.0 / 12.0};
+    float runningTime{0};
 
     SetTargetFPS(60);
 
     while (!WindowShouldClose())
     {
+        float dt{GetFrameTime()};
+        runningTime += dt;
+
+        if (runningTime >= updateTime)
+        {
+            if (frame > 5)
+                frame = 0;
+            frame++;
+            runningTime = 0;
+        }
+
+        scarfyRec.x = frame * scarfyRec.width;
+
         BeginDrawing();
         ClearBackground(WHITE);
 
@@ -36,12 +53,12 @@ int main(void)
         if (!isInAir)
             velocity = 0;
         else
-            velocity += gravity;
+            velocity += gravity * dt;
 
         if (IsKeyPressed(KEY_SPACE) && !isInAir)
             velocity += jumpVelocity;
 
-        scarfyPos.y += velocity;
+        scarfyPos.y += velocity * dt;
 
         DrawTextureRec(scarfy, scarfyRec, scarfyPos, WHITE);
 
