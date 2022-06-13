@@ -6,8 +6,16 @@ int main(void)
     const int windowHeight{450};
     InitWindow(windowWidth, windowHeight, "Dapper Dasher");
 
-    Texture2D scarfy = LoadTexture("textures/scarfy.png");
+    Texture2D nebula = LoadTexture("textures/12_nebula_spritesheet.png");
+    Rectangle nebRec{0, 0, nebula.width / 8, nebula.height / 8};
+    Vector2 nebPos{windowWidth, windowHeight - nebRec.height};
+    int nebVel{-600};
 
+    int nebFrame;
+    const float nebUpdateTime{1.0 / 12.0};
+    float nebRunningTime{};
+
+    Texture2D scarfy = LoadTexture("textures/scarfy.png");
     Rectangle scarfyRec;
     scarfyRec.width = scarfy.width / 6;
     scarfyRec.height = scarfy.height;
@@ -33,7 +41,10 @@ int main(void)
     while (!WindowShouldClose())
     {
         float dt{GetFrameTime()};
-        runningTime += dt;
+        nebRunningTime += dt;
+
+        if (!isInAir)
+            runningTime += dt;
 
         if (runningTime >= updateTime)
         {
@@ -42,11 +53,16 @@ int main(void)
             frame++;
             runningTime = 0;
         }
-
         scarfyRec.x = frame * scarfyRec.width;
 
-        BeginDrawing();
-        ClearBackground(WHITE);
+        if (nebRunningTime >= nebUpdateTime)
+        {
+            if (nebFrame > 7)
+                nebFrame = 0;
+            nebFrame++;
+            nebRunningTime = 0;
+        }
+        nebRec.x = nebFrame * nebRec.width;
 
         isInAir = scarfyPos.y < windowHeight - scarfyRec.height;
 
@@ -59,6 +75,12 @@ int main(void)
             velocity += jumpVelocity;
 
         scarfyPos.y += velocity * dt;
+        nebPos.x += nebVel * dt;
+
+        BeginDrawing();
+        ClearBackground(WHITE);
+
+        DrawTextureRec(nebula, nebRec, nebPos, WHITE);
 
         DrawTextureRec(scarfy, scarfyRec, scarfyPos, WHITE);
 
@@ -66,6 +88,7 @@ int main(void)
     }
 
     UnloadTexture(scarfy);
+    UnloadTexture(nebula);
     CloseWindow();
 
     return 0;
