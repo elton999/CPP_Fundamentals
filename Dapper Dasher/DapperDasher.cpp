@@ -4,19 +4,26 @@ int main(void)
 {
     const int windowWidth{800};
     const int windowHeight{450};
+    InitWindow(windowWidth, windowHeight, "Dapper Dasher");
+
+    Texture2D scarfy = LoadTexture("textures/scarfy.png");
+
+    Rectangle scarfyRec;
+    scarfyRec.width = scarfy.width / 6;
+    scarfyRec.height = scarfy.height;
+    scarfyRec.x = 0;
+    scarfyRec.y = 0;
+    Vector2 scarfyPos;
+    scarfyPos.x = windowWidth / 2 - scarfyRec.width / 2;
+    scarfyPos.y = windowHeight - scarfyRec.height;
 
     const int gravity{1};
-
-    const int width{50};
-    const int height{80};
-    int posY{windowHeight - height};
 
     int velocity{0};
     int jumpVelocity{-21};
 
     bool isInAir{false};
 
-    InitWindow(windowWidth, windowHeight, "Dapper Dasher");
     SetTargetFPS(60);
 
     while (!WindowShouldClose())
@@ -24,7 +31,7 @@ int main(void)
         BeginDrawing();
         ClearBackground(WHITE);
 
-        isInAir = posY < windowHeight - height;
+        isInAir = scarfyPos.y < windowHeight - scarfyRec.height;
 
         if (!isInAir)
             velocity = 0;
@@ -34,12 +41,14 @@ int main(void)
         if (IsKeyPressed(KEY_SPACE) && !isInAir)
             velocity += jumpVelocity;
 
-        posY += velocity;
+        scarfyPos.y += velocity;
 
-        DrawRectangle(windowWidth / 2, posY, width, height, BLUE);
+        DrawTextureRec(scarfy, scarfyRec, scarfyPos, WHITE);
 
         EndDrawing();
     }
+
+    UnloadTexture(scarfy);
     CloseWindow();
 
     return 0;
