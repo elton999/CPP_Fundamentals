@@ -9,20 +9,47 @@ struct AnimData
     float runningTime;
 };
 
+bool isOnGround(AnimData data, int windowHeight)
+{
+    return data.pos.y < windowHeight - data.rec.height;
+}
+
+AnimData updateAnimData(AnimData data, float deltaTime, int maxFrame)
+{
+    data.runningTime += deltaTime;
+
+    if (data.runningTime >= data.updateTime)
+    {
+        if (data.frame > maxFrame)
+            data.frame = 0;
+        data.frame++;
+        data.runningTime = 0;
+    }
+    data.rec.x = data.frame * data.rec.width;
+
+    return data;
+}
+
 int main(void)
 {
-    const int windowWidth{800};
-    const int windowHeight{450};
-    InitWindow(windowWidth, windowHeight, "Dapper Dasher");
+    const int windowDimensions[2]{512, 380};
+
+    InitWindow(windowDimensions[0], windowDimensions[1], "Dapper Dasher");
 
     Texture2D nebula = LoadTexture("textures/12_nebula_spritesheet.png");
-    AnimData nebData{
-        {0, 0, nebula.width / 8, nebula.height / 8},
-        {windowWidth, windowHeight - nebula.height / 8},
-        0,
-        1.0 / 12.0,
-        0};
 
+    const int sizeOfNebulae{10};
+    AnimData nebulae[sizeOfNebulae]{};
+    for (int i = 0; i < sizeOfNebulae; i++)
+    {
+        AnimData nebData{
+            {0, 0, nebula.width / 8, nebula.height / 8},
+            {windowDimensions[0] + 300 * i, windowDimensions[1] - nebula.height / 8},
+            0,
+            1.0 / 12.0,
+            0};
+        nebulae[i] = nebData;
+    }
     int nebVel{-600};
 
     Texture2D scarfy = LoadTexture("textures/scarfy.png");
@@ -32,8 +59,8 @@ int main(void)
     scarfyData.rec.y = 0;
     scarfyData.rec.width = scarfy.width / 6;
     scarfyData.rec.height = scarfy.height;
-    scarfyData.pos.x = windowWidth / 2 - scarfyData.rec.width / 2;
-    scarfyData.pos.y = windowHeight - scarfyData.rec.height;
+    scarfyData.pos.x = windowDimensions[0] / 2 - scarfyData.rec.width / 2;
+    scarfyData.pos.y = windowDimensions[1] - scarfyData.rec.height;
     scarfyData.frame = 0;
     scarfyData.runningTime = 0;
     scarfyData.updateTime = 1.0 / 12.0;
@@ -50,30 +77,11 @@ int main(void)
     while (!WindowShouldClose())
     {
         float dt{GetFrameTime()};
-        nebData.runningTime += dt;
 
         if (!isInAir)
-            scarfyData.runningTime += dt;
+            scarfyData = updateAnimData(scarfyData, dt, 5);
 
-        if (scarfyData.runningTime >= scarfyData.updateTime)
-        {
-            if (scarfyData.frame > 5)
-                scarfyData.frame = 0;
-            scarfyData.frame++;
-            scarfyData.runningTime = 0;
-        }
-        scarfyData.rec.x = scarfyData.frame * scarfyData.rec.width;
-
-        if (nebData.runningTime >= nebData.updateTime)
-        {
-            if (nebData.frame > 7)
-                nebData.frame = 0;
-            nebData.frame++;
-            nebData.runningTime = 0;
-        }
-        nebData.rec.x = nebData.frame * nebData.rec.width;
-
-        isInAir = scarfyData.pos.y < windowHeight - scarfyData.rec.height;
+        isInAir = isOnGround(scarfyData, windowDimensions[1]);
 
         if (!isInAir)
             velocity = 0;
@@ -84,12 +92,16 @@ int main(void)
             velocity += jumpVelocity;
 
         scarfyData.pos.y += velocity * dt;
-        nebData.pos.x += nebVel * dt;
 
         BeginDrawing();
         ClearBackground(WHITE);
 
-        DrawTextureRec(nebula, nebData.rec, nebData.pos, WHITE);
+        for (int i = 0; i < sizeOfNebulae; i++)
+        {
+            nebulae[i] = updateAnimData(nebulae[i], dt, 7);
+            nebulae[i].pos.x += nebVel * dt;
+            DrawTextureRec(nebula, nebulae[i].rec, nebulae[i].pos, WHITE);
+        }
 
         DrawTextureRec(scarfy, scarfyData.rec, scarfyData.pos, WHITE);
 
