@@ -30,6 +30,22 @@ AnimData updateAnimData(AnimData data, float deltaTime, int maxFrame)
     return data;
 }
 
+float updateBackground(int spriteWidth, float deltaTime, float posX, float velocity)
+{
+    posX -= velocity * deltaTime;
+    if (posX <= -spriteWidth * 2)
+        posX = 0;
+    return posX;
+}
+
+void renderBackground(Texture2D sprite, float posX)
+{
+    Vector2 pos{posX, 0};
+    Vector2 pos2{posX + sprite.width * 2, 0};
+    DrawTextureEx(sprite, pos, 0, 2, WHITE);
+    DrawTextureEx(sprite, pos2, 0, 2, WHITE);
+}
+
 int main(void)
 {
     const int windowDimensions[2]{512, 380};
@@ -74,6 +90,10 @@ int main(void)
 
     Texture2D background = LoadTexture("textures/far-buildings.png");
     float bgX{};
+    Texture2D midground = LoadTexture("textures/back-buildings.png");
+    float mgX{};
+    Texture2D foreground = LoadTexture("textures/foreground.png");
+    float fgX{};
 
     SetTargetFPS(60);
 
@@ -99,14 +119,14 @@ int main(void)
         BeginDrawing();
         ClearBackground(WHITE);
 
-        bgX -= 20 * dt;
-        if (bgX <= -background.width * 2)
-            bgX = 0;
+        bgX = updateBackground(background.width, dt, bgX, 20);
+        renderBackground(background, bgX);
 
-        Vector2 bgPos{bgX, 0};
-        DrawTextureEx(background, bgPos, 0, 2, WHITE);
-        Vector2 bg2Pos{bgX + background.width * 2, 0};
-        DrawTextureEx(background, bg2Pos, 0, 2, WHITE);
+        mgX = updateBackground(midground.width, dt, mgX, 40);
+        renderBackground(midground, mgX);
+
+        fgX = updateBackground(foreground.width, dt, fgX, 80);
+        renderBackground(foreground, fgX);
 
         for (int i = 0; i < sizeOfNebulae; i++)
         {
@@ -123,6 +143,8 @@ int main(void)
     UnloadTexture(scarfy);
     UnloadTexture(nebula);
     UnloadTexture(background);
+    UnloadTexture(midground);
+    UnloadTexture(foreground);
     CloseWindow();
 
     return 0;
