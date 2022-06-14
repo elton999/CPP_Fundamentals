@@ -1,4 +1,5 @@
 #include "raylib.h"
+#include <iostream>
 
 struct AnimData
 {
@@ -54,7 +55,7 @@ int main(void)
 
     Texture2D nebula = LoadTexture("textures/12_nebula_spritesheet.png");
 
-    const int sizeOfNebulae{10};
+    const int sizeOfNebulae{3};
     AnimData nebulae[sizeOfNebulae]{};
     for (int i = 0; i < sizeOfNebulae; i++)
     {
@@ -66,7 +67,9 @@ int main(void)
             0};
         nebulae[i] = nebData;
     }
-    int nebVel{-600};
+    int nebVel{-200};
+
+    float finishLine{nebulae[sizeOfNebulae - 1].pos.x};
 
     Texture2D scarfy = LoadTexture("textures/scarfy.png");
 
@@ -95,6 +98,8 @@ int main(void)
     Texture2D foreground = LoadTexture("textures/foreground.png");
     float fgX{};
 
+    bool collision{};
+
     SetTargetFPS(60);
 
     while (!WindowShouldClose())
@@ -118,24 +123,51 @@ int main(void)
 
         BeginDrawing();
         ClearBackground(WHITE);
-
-        bgX = updateBackground(background.width, dt, bgX, 20);
-        renderBackground(background, bgX);
-
-        mgX = updateBackground(midground.width, dt, mgX, 40);
-        renderBackground(midground, mgX);
-
-        fgX = updateBackground(foreground.width, dt, fgX, 80);
-        renderBackground(foreground, fgX);
-
-        for (int i = 0; i < sizeOfNebulae; i++)
+        if (!collision)
         {
-            nebulae[i] = updateAnimData(nebulae[i], dt, 7);
-            nebulae[i].pos.x += nebVel * dt;
-            DrawTextureRec(nebula, nebulae[i].rec, nebulae[i].pos, WHITE);
-        }
+            bgX = updateBackground(background.width, dt, bgX, 20);
+            renderBackground(background, bgX);
 
-        DrawTextureRec(scarfy, scarfyData.rec, scarfyData.pos, WHITE);
+            mgX = updateBackground(midground.width, dt, mgX, 40);
+            renderBackground(midground, mgX);
+
+            fgX = updateBackground(foreground.width, dt, fgX, 80);
+            renderBackground(foreground, fgX);
+
+            for (AnimData nebula : nebulae)
+            {
+                float pad{50};
+                Rectangle nebRec = {
+                    nebula.pos.x + pad,
+                    nebula.pos.y + pad,
+                    nebula.rec.width - 2 * pad,
+                    nebula.rec.height - 2 * pad};
+
+                Rectangle scarfyRec{
+                    scarfyData.pos.x,
+                    scarfyData.pos.y,
+                    scarfyData.rec.width,
+                    scarfyData.rec.width};
+
+                if (CheckCollisionRecs(nebRec, scarfyRec))
+                    collision = true;
+            }
+
+            for (int i = 0; i < sizeOfNebulae; i++)
+            {
+                nebulae[i] = updateAnimData(nebulae[i], dt, 7);
+                nebulae[i].pos.x += nebVel * dt;
+                DrawTextureRec(nebula, nebulae[i].rec, nebulae[i].pos, WHITE);
+            }
+
+            DrawTextureRec(scarfy, scarfyData.rec, scarfyData.pos, WHITE);
+        }
+        finishLine += nebVel * dt;
+
+        if (collision)
+            DrawText("You Lose!!!!", 20, 20, 20, RED);
+        if (finishLine <= 0)
+            DrawText("You Win!!!!", 20, 20, 20, RED);
 
         EndDrawing();
     }
