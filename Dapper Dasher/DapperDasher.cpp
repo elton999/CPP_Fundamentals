@@ -72,6 +72,9 @@ int main(void)
 
     bool isInAir{false};
 
+    Texture2D background = LoadTexture("textures/far-buildings.png");
+    float bgX{};
+
     SetTargetFPS(60);
 
     while (!WindowShouldClose())
@@ -96,6 +99,15 @@ int main(void)
         BeginDrawing();
         ClearBackground(WHITE);
 
+        bgX -= 20 * dt;
+        if (bgX <= -background.width * 2)
+            bgX = 0;
+
+        Vector2 bgPos{bgX, 0};
+        DrawTextureEx(background, bgPos, 0, 2, WHITE);
+        Vector2 bg2Pos{bgX + background.width * 2, 0};
+        DrawTextureEx(background, bg2Pos, 0, 2, WHITE);
+
         for (int i = 0; i < sizeOfNebulae; i++)
         {
             nebulae[i] = updateAnimData(nebulae[i], dt, 7);
@@ -110,6 +122,7 @@ int main(void)
 
     UnloadTexture(scarfy);
     UnloadTexture(nebula);
+    UnloadTexture(background);
     CloseWindow();
 
     return 0;
