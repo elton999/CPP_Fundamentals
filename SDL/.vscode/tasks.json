@@ -1,0 +1,33 @@
+{
+    "tasks": [
+        {
+            "type": "cppbuild",
+            "label": "C/C++: g++.exe arquivo de build ativo",
+            "command": "C:\\MinGW\\64bits\\MinGW-8.1.0\\mingw64\\bin\\g++.exe",
+            "args": [
+                "-fdiagnostics-color=always",
+                "-g",
+                "${file}",
+                "-I \"C:\\MinGW\\64bits\\MinGW-8.1.0\\mingw64\\include\\SDL2\" ",
+                "-mwindows ",
+                "-lmingw32 ",
+                "-lSDL2main ",
+                "-lSDL2",
+                "-o",
+                "${fileDirname}\\Build\\${fileBasenameNoExtension}.exe"
+            ],
+            "options": {
+                "cwd": "${fileDirname}"
+            },
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "detail": "Tarefa gerada pelo Depurador."
+        }
+    ],
+    "version": "2.0.0"
+}
