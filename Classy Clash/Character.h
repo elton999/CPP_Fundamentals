@@ -8,6 +8,7 @@ public:
     Vector2 getWorldPos() { return worldPos; }
     void Tick(float deltaTime);
     void undoMovement();
+    Rectangle getCollisionRec();
 
 private:
     float width{}, height{};
