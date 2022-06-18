@@ -4,10 +4,10 @@
 class Character
 {
 public:
-    Character();
+    Character(int winWidth, int winHeight);
     Vector2 getWorldPos() { return worldPos; }
-    void setScreenPos(int winWidth, int winHeight);
     void Tick(float deltaTime);
+    void undoMovement();
 
 private:
     float width{}, height{};
@@ -24,4 +24,7 @@ private:
     int maxFrames{6};
     float updateTime{1.f / 12.f};
     float speed{4.f};
+    float scale{4.0};
+
+    Vector2 worldPosLastFrame{};
 };
