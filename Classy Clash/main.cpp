@@ -3,6 +3,7 @@
 #include "Character.h"
 #include "Enemy.h"
 #include "Prop.h"
+#include <string>
 
 int main(void)
 {
@@ -49,10 +50,23 @@ int main(void)
 
         goblin.tick(dT);
 
+        if (!knight.getAlive())
+        {
+            DrawText("Game Over", 55.f, 45.f, 40, RED);
+            continue;
+        }
+        else
+        {
+            std::string knightsHealth{"Health: "};
+            knightsHealth.append(std::to_string(knight.getHealth()), 0, 5);
+            DrawText(knightsHealth.c_str(), 55.f, 45.f, 40, RED);
+        }
+
         knight.tick(dT);
 
-        if (IsMouseButtonDown(MOUSE_LEFT_BUTTON) && CheckCollisionRecs(goblin.getCollisionRec(), knight.getWeaponCollisionRec()))
-            goblin.setAlive(false);
+        if (IsMouseButtonDown(MOUSE_LEFT_BUTTON))
+            if (CheckCollisionRecs(goblin.getCollisionRec(), knight.getWeaponCollisionRec()))
+                goblin.setAlive(false);
 
         if (knight.getWorldPos().x < 0.f ||
             knight.getWorldPos().y < 0.f ||

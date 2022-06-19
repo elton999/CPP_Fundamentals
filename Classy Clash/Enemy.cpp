@@ -21,9 +21,12 @@ void Enemy::tick(float deltaTime)
     if (!getAlive())
         return;
 
-    velocity = Vector2Subtract(target->getWorldPos(), getScreenPos());
+    velocity = Vector2Subtract(target->getScreenPos(), getScreenPos());
 
     BaseCharacter::tick(deltaTime);
+
+    if (CheckCollisionRecs(target->getCollisionRec(), getCollisionRec()))
+        target->takeDamage(damagePerSecond * deltaTime);
 }
 
 Vector2 Enemy::getScreenPos()

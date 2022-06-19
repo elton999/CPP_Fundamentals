@@ -16,6 +16,13 @@ Vector2 Character::getScreenPos()
         static_cast<float>(windowHeight) / 2.0f - scale * (0.5f * height)};
 }
 
+void Character::takeDamage(float demage)
+{
+    health -= demage;
+    if (health <= 0.f)
+        setAlive(false);
+}
+
 void Character::tick(float deltaTime)
 {
     if (!getAlive())
@@ -39,8 +46,8 @@ void Character::tick(float deltaTime)
         getScreenPos().y + offset.y - weapon.height * scale,
         weapon.width * scale,
         weapon.height * scale};
-    rotation = IsMouseButtonDown(MOUSE_LEFT_BUTTON) ? rotation = -35.f : rotation = 0;
 
+    rotation = IsMouseButtonDown(MOUSE_LEFT_BUTTON) ? rotation = -35.f : rotation = 0;
     if (rightLeft > 0.f)
     {
         origin.x = 0.f;
