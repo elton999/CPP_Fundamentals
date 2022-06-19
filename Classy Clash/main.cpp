@@ -17,6 +17,8 @@ int main(void)
         LoadTexture("characters/goblin_idle_spritesheet.png"),
         LoadTexture("characters/goblin_run_spritesheet.png")};
 
+    goblin.setTarget(&knight);
+
     Prop props[2]{
         Prop{
             LoadTexture("nature_tileset/Rock.png"),
@@ -38,7 +40,7 @@ int main(void)
         ClearBackground(WHITE);
 
         mapPos = Vector2Scale(knight.getWorldPos(), -1.f);
-        DrawTextureEx(map, mapPos, 0, 4.0, WHITE);
+        DrawTextureEx(map, mapPos, 0, scale, WHITE);
 
         for (auto prop : props)
             prop.Render(knight.getWorldPos());
