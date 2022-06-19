@@ -18,13 +18,15 @@ Enemy::Enemy(Vector2 pos, Texture2D idle_texture, Texture2D run_texture)
 
 void Enemy::tick(float deltaTime)
 {
-    Vector2 direction = Vector2Subtract(target->getWorldPos(), screenPos);
-    direction = Vector2Normalize(direction);
-    direction = Vector2Scale(direction, speed);
+    if (!getAlive())
+        return;
 
-    worldPos = Vector2Add(worldPos, direction);
-
-    screenPos = Vector2Subtract(worldPos, target->getWorldPos());
+    velocity = Vector2Subtract(target->getWorldPos(), getScreenPos());
 
     BaseCharacter::tick(deltaTime);
+}
+
+Vector2 Enemy::getScreenPos()
+{
+    return Vector2Subtract(worldPos, target->getWorldPos());
 }

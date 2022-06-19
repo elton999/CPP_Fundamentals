@@ -51,6 +51,9 @@ int main(void)
 
         knight.tick(dT);
 
+        if (IsMouseButtonDown(MOUSE_LEFT_BUTTON) && CheckCollisionRecs(goblin.getCollisionRec(), knight.getWeaponCollisionRec()))
+            goblin.setAlive(false);
+
         if (knight.getWorldPos().x < 0.f ||
             knight.getWorldPos().y < 0.f ||
             knight.getWorldPos().x + windowDimensions[0] > map.width * scale ||
