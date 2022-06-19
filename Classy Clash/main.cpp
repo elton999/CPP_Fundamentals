@@ -1,6 +1,7 @@
 #include "raylib.h"
 #include "raymath.h"
 #include "Character.h"
+#include "Enemy.h"
 #include "Prop.h"
 
 int main(void)
@@ -10,6 +11,11 @@ int main(void)
     InitWindow(windowDimensions[0], windowDimensions[1], "RPG game");
 
     Character knight{windowDimensions[0], windowDimensions[1]};
+
+    Enemy goblin{
+        Vector2{0, 0},
+        LoadTexture("characters/goblin_idle_spritesheet.png"),
+        LoadTexture("characters/goblin_run_spritesheet.png")};
 
     Prop props[2]{
         Prop{
@@ -37,7 +43,11 @@ int main(void)
         for (auto prop : props)
             prop.Render(knight.getWorldPos());
 
-        knight.Tick(GetFrameTime());
+        float dT = GetFrameTime();
+
+        goblin.tick(dT);
+
+        knight.tick(dT);
 
         if (knight.getWorldPos().x < 0.f ||
             knight.getWorldPos().y < 0.f ||
