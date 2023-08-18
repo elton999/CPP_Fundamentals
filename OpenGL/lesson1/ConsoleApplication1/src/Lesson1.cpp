@@ -8,6 +8,8 @@ const char* APP_TITLE = "Introduction to Modern OpenGL - Hello Window 1";
 const int gWindowWidth = 800;
 const int gWindowHeight = 600;
 
+void glfw_onKey(GLFWwindow* window, int key, int scancode, int action, int mode);
+
 int main()
 {
     if (!glfwInit())
@@ -32,6 +34,8 @@ int main()
 
     glfwMakeContextCurrent(pWindow);
 
+    glfwSetKeyCallback(pWindow, glfw_onKey);
+
     glewExperimental = GL_TRUE;
     if (glewInit() != GLEW_OK)
     {
@@ -51,4 +55,10 @@ int main()
 
     glfwTerminate();
     return 0;
+}
+
+void glfw_onKey(GLFWwindow* window, int key, int scancode, int action, int mode)
+{
+    if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
+        glfwSetWindowShouldClose(window, GL_TRUE);
 }
