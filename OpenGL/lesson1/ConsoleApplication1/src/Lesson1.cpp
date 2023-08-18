@@ -1,4 +1,5 @@
 #include <iostream>
+#include <sstream>
 
 #define GLEW_STATIC
 #include "GL/glew.h"
@@ -7,8 +8,10 @@
 const char* APP_TITLE = "Introduction to Modern OpenGL - Hello Window 1";
 const int gWindowWidth = 800;
 const int gWindowHeight = 600;
+bool gFullScreen = false;
 
 void glfw_onKey(GLFWwindow* window, int key, int scancode, int action, int mode);
+void showFPS(GLFWwindow* window);
 
 int main()
 {
@@ -45,6 +48,7 @@ int main()
 
     while (!glfwWindowShouldClose(pWindow))
     {
+        showFPS(pWindow);
         glfwPollEvents();
 
         glClearColor(0.23f, 0.38f, 0.47f, 1.0f);
@@ -61,4 +65,33 @@ void glfw_onKey(GLFWwindow* window, int key, int scancode, int action, int mode)
 {
     if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
         glfwSetWindowShouldClose(window, GL_TRUE);
+}
+
+void showFPS(GLFWwindow* window)
+{
+    static double previousSecond = 0.0;
+    static int frameCount = 0;
+    double elapsedSecond;
+    double currentSeconds = glfwGetTime();
+
+    elapsedSecond = currentSeconds - previousSecond;
+
+    if (elapsedSecond > 0.25)
+    {
+        previousSecond = currentSeconds;
+        double fps = (double)frameCount / elapsedSecond;
+        double msPerFrame = 1000.0 / fps;
+
+        std::ostringstream outs;
+        outs.precision(3);
+        outs << std::fixed
+            << APP_TITLE << "   "
+            << "FPS: " << fps << "   "
+            << "Frame Time: " << msPerFrame << " (ms)";
+        glfwSetWindowTitle(window, outs.str().c_str());
+
+        frameCount = 0;
+    }
+
+    frameCount++;
 }
