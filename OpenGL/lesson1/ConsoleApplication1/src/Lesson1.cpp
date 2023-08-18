@@ -26,7 +26,16 @@ int main()
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 
-    GLFWwindow* pWindow = glfwCreateWindow(gWindowWidth, gWindowHeight, APP_TITLE, NULL, NULL);
+    GLFWwindow* pWindow = NULL;
+    if (gFullScreen)
+    {
+        GLFWmonitor* pMonitor = glfwGetPrimaryMonitor();
+        const GLFWvidmode* pVmode = glfwGetVideoMode(pMonitor);
+        if (pVmode != NULL)
+            pWindow = glfwCreateWindow(pVmode->width, pVmode->height, APP_TITLE, pMonitor, NULL);
+    }
+    else
+        pWindow = glfwCreateWindow(gWindowWidth, gWindowHeight, APP_TITLE, NULL, NULL);
 
     if (pWindow == NULL)
     {
