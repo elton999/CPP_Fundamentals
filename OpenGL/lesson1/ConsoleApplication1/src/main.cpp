@@ -9,6 +9,7 @@ const char* APP_TITLE = "Introduction to Modern OpenGL - Hello Triangle";
 const int gWindowWidth = 800;
 const int gWindowHeight = 600;
 GLFWwindow* gWindow = NULL;
+bool gWireframe = false;
 bool gFullScreen = false;
 
 const GLchar* vertexShaderSrc =
@@ -180,6 +181,15 @@ void glfw_onKey(GLFWwindow* window, int key, int scancode, int action, int mode)
 {
     if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
         glfwSetWindowShouldClose(window, GL_TRUE);
+    if (key == GLFW_KEY_W && action == GLFW_PRESS)
+    {
+        gWireframe = !gWireframe;
+
+        if (gWireframe)
+            glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+        else
+            glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+    }
 }
 
 void showFPS(GLFWwindow* window)
