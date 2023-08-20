@@ -14,7 +14,6 @@ const int gWindowHeight = 600;
 GLFWwindow* gWindow = NULL;
 bool gWireframe = false;
 bool gFullScreen = false;
-const std::string texture1 = "wooden_crate.jpg";
 
 void glfw_onKey(GLFWwindow* window, int key, int scancode, int action, int mode);
 void showFPS(GLFWwindow* window);
@@ -68,8 +67,11 @@ int main()
     ShaderProgram shaderProgram;
     shaderProgram.loadShaders("basic.vert", "basic.frag");
 
-    Texture2D texture;
-    texture.loadTexture(texture1, true);
+    Texture2D texture1;
+    texture1.loadTexture("wooden_crate.jpg", true);
+    
+    Texture2D texture2;
+    texture2.loadTexture("wooden_crate.jpg", true);
 
     while (!glfwWindowShouldClose(gWindow))
     {
@@ -78,8 +80,13 @@ int main()
 
         glClear(GL_COLOR_BUFFER_BIT);
 
-        texture.bind();
+        texture1.bind(0);
+        texture2.bind(1);
+        
         shaderProgram.use();
+
+        glUniform1i(glGetUniformLocation(shaderProgram.getProgram(), "myTexture1"), 0);
+        glUniform1i(glGetUniformLocation(shaderProgram.getProgram(), "myTexture2"), 1);
 
         glBindVertexArray(vao);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);

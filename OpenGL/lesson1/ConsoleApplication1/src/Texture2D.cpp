@@ -62,5 +62,6 @@ bool Texture2D::loadTexture(const string& filename, bool generateMipMaps)
 
 void Texture2D::bind(GLuint textUnit)
 {
+	glActiveTexture(GL_TEXTURE0 + textUnit);
 	glBindTexture(GL_TEXTURE_2D, mTexture);
 }
