@@ -6,6 +6,7 @@
 #include "GLFW/glfw3.h"
 
 #include "ShaderProgram.h"
+#include "Texture2D.h"
 
 const char* APP_TITLE = "Introduction to Modern OpenGL - Hello Shader";
 const int gWindowWidth = 800;
@@ -13,6 +14,7 @@ const int gWindowHeight = 600;
 GLFWwindow* gWindow = NULL;
 bool gWireframe = false;
 bool gFullScreen = false;
+const std::string texture1 = "wooden_crate.jpg";
 
 void glfw_onKey(GLFWwindow* window, int key, int scancode, int action, int mode);
 void showFPS(GLFWwindow* window);
@@ -29,10 +31,11 @@ int main()
 
     GLfloat vert_pos[]
     {
-        -0.5f,  0.5f, 0.0f,   
-         0.5f,  0.5f, 0.0f,  
-         0.5f, -0.5f, 0.0f,
-        -0.5f, -0.5f, 0.0f
+        // position          // texture coords
+        -0.5f,  0.5f, 0.0f,   0.0f, 1.0f,
+         0.5f,  0.5f, 0.0f,   1.0f, 1.0f,
+         0.5f, -0.5f, 0.0f,   1.0f, 0.0f,
+        -0.5f, -0.5f, 0.0f,   0.0f, 0.0f
     };
 
     GLuint indices[]
@@ -51,8 +54,12 @@ int main()
     glBindVertexArray(vao);
 
     // position
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, NULL);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), NULL);
     glEnableVertexAttribArray(0);
+
+    // tex coord
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (GLfloat*)(3 * sizeof(GLfloat)));
+    glEnableVertexAttribArray(1);
 
     glGenBuffers(1, &ibo);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
@@ -61,6 +68,9 @@ int main()
     ShaderProgram shaderProgram;
     shaderProgram.loadShaders("basic.vert", "basic.frag");
 
+    Texture2D texture;
+    texture.loadTexture(texture1, true);
+
     while (!glfwWindowShouldClose(gWindow))
     {
         showFPS(gWindow);
@@ -68,15 +78,8 @@ int main()
 
         glClear(GL_COLOR_BUFFER_BIT);
 
+        texture.bind();
         shaderProgram.use();
-
-        GLfloat time = glfwGetTime();
-        GLfloat blueColor = (sin(time) / 2) + 0.5f;
-        glm::vec2 pos;
-        pos.x = sin(time) / 2;
-        pos.y = cos(time) / 2;
-        shaderProgram.setUniform("vertColor", glm::vec4(0.0f, 0.0f, blueColor, 1.0f));
-        shaderProgram.setUniform("posOffset", pos);
 
         glBindVertexArray(vao);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
