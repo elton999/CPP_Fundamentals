@@ -8,6 +8,7 @@
 
 #include "ShaderProgram.h"
 #include "Texture2D.h"
+#include "Camera.h"
 
 const char* APP_TITLE = "Introduction to Modern OpenGL - Hello Shader";
 int gWindowWidth = 1024;
@@ -16,8 +17,15 @@ GLFWwindow* gWindow = NULL;
 bool gWireframe = false;
 bool gFullScreen = false;
 
+OrbitCamera orbtiCamera;
+float gYaw = 0.0f;
+float gPitch = 0.0f;
+float gRadius = 10.0f;
+const float MOUSE_SENSITIVITY = 0.25f;
+
 void glfw_onKey(GLFWwindow* window, int key, int scancode, int action, int mode);
 void glfw_OnFrameBufferSize(GLFWwindow* window, int width, int height);
+void glfw_OnMouseMove(GLFWwindow* window, double posX, double posY);
 void showFPS(GLFWwindow* window);
 bool InitOpenGL();
 
@@ -123,18 +131,15 @@ int main()
 
         texture1.bind(0);
 
-        cubeAngle += (float)(deltaTime * 50.0f);
-        if (cubeAngle >= 360.0f) cubeAngle = 0.0f;
-
         glm::mat4 model, view, projection;
 
-        model = glm::translate(model, cubePos) * glm::rotate(model, glm::radians(cubeAngle), glm::vec3(0.0f, 1.0f, 0.0f));
-        glm::vec3 camPos(0.0f, 0.0f, 0.0f);
-        glm::vec3 targetPos(0.0f, 0.0f, -1.0f);
-        glm::vec3 up(0.0f, 1.0f, 0.0f);
-        view = glm::lookAt(camPos, targetPos, up);
+        orbtiCamera.setLookAt(cubePos);
+        orbtiCamera.rotate(gYaw, gPitch);
+        orbtiCamera.setRadious(gRadius);
 
-        projection = glm::perspective(glm::radians(45.0f), (float)gWindowWidth / (float)gWindowWidth, 0.1f, 100.0f);
+        model = glm::translate(model, cubePos);
+        view = orbtiCamera.GetViewMatrix();
+        projection = glm::perspective(glm::radians(45.0f), (float)gWindowWidth / (float)gWindowHeight, 0.1f, 100.0f);
         
         shaderProgram.use();
         shaderProgram.setUniform("model", model);
@@ -192,6 +197,7 @@ bool InitOpenGL()
     glfwMakeContextCurrent(gWindow);
 
     glfwSetKeyCallback(gWindow, glfw_onKey);
+    glfwSetCursorPosCallback(gWindow, glfw_OnMouseMove);
 
     glewExperimental = GL_TRUE;
     if (glewInit() != GLEW_OK)
@@ -227,6 +233,27 @@ void glfw_OnFrameBufferSize(GLFWwindow* window, int width, int height)
     gWindowWidth = width;
     gWindowHeight = height;
     glViewport(0, 0, gWindowWidth, gWindowHeight);
+}
+
+void glfw_OnMouseMove(GLFWwindow* window, double posX, double posY)
+{
+    static glm::vec2 lastMousePos = glm::vec2(0, 0);
+
+    if (glfwGetMouseButton(gWindow, GLFW_MOUSE_BUTTON_LEFT) == 1)
+    {
+        gYaw -= ((float)posX - lastMousePos.x) * MOUSE_SENSITIVITY;
+        gPitch += ((float)posY - lastMousePos.y) * MOUSE_SENSITIVITY;
+    }
+
+    if (glfwGetMouseButton(gWindow, GLFW_MOUSE_BUTTON_RIGHT) == 1)
+    {
+        float dx = 0.01f * ((float)posX - lastMousePos.x);
+        float dy = 0.01f * ((float)posY - lastMousePos.y);
+        gRadius += dx - dy;
+    }
+
+    lastMousePos.x = (float)posX;
+    lastMousePos.y = (float)posY;
 }
 
 void showFPS(GLFWwindow* window)
