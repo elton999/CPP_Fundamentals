@@ -115,6 +115,8 @@ int main()
     Texture2D texture1;
     texture1.loadTexture("wooden_crate.jpg", true);
 
+    Texture2D texture2;
+
     float cubeAngle = 0.0f;
     double lastTime = glfwGetTime();
 
@@ -150,6 +152,14 @@ int main()
 
         glBindVertexArray(vao);
         glDrawArrays(GL_TRIANGLES, 0, 36);
+
+
+        texture2.bind(0);
+        glm::vec3 floorPos;
+        model = glm::translate(model, floorPos) * glm::scale(model, glm::vec3(10.0f, 0.0f, 10.0f));
+        shaderProgram.setUniform("model", model);
+        glDrawArrays(GL_TRIANGLES, 0, 36);
+
         glBindVertexArray(0);
 
         glfwSwapBuffers(gWindow);
