@@ -55,5 +55,8 @@
     <CopyFileToFolders Include="bin\wooden_crate.jpg">
       <Filter>Arquivos de Recurso</Filter>
     </CopyFileToFolders>
+    <CopyFileToFolders Include="bin\grid.jpg">
+      <Filter>Arquivos de Recurso</Filter>
+    </CopyFileToFolders>
   </ItemGroup>
 </Project>

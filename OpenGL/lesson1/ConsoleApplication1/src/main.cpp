@@ -17,15 +17,16 @@ GLFWwindow* gWindow = NULL;
 bool gWireframe = false;
 bool gFullScreen = false;
 
-OrbitCamera orbtiCamera;
-float gYaw = 0.0f;
-float gPitch = 0.0f;
-float gRadius = 10.0f;
-const float MOUSE_SENSITIVITY = 0.25f;
+FPSCamera fpsCamera(glm::vec3(0.0f, 0.0f, 5.0f));
+const double ZOOM_SENSITIVITY = -3.0;
+const float MOVE_SPEED = 5.0;
+const float MOUSE_SENSITIVITY = 0.5f;
 
 void glfw_onKey(GLFWwindow* window, int key, int scancode, int action, int mode);
 void glfw_OnFrameBufferSize(GLFWwindow* window, int width, int height);
 void glfw_OnMouseMove(GLFWwindow* window, double posX, double posY);
+void glfw_OnMouseScroll(GLFWwindow* window, double deltaX, double deltaY);
+void Update(double elapsedTime);
 void showFPS(GLFWwindow* window);
 bool InitOpenGL();
 
@@ -116,6 +117,7 @@ int main()
     texture1.loadTexture("wooden_crate.jpg", true);
 
     Texture2D texture2;
+    texture2.loadTexture("grid.jpg", true);
 
     float cubeAngle = 0.0f;
     double lastTime = glfwGetTime();
@@ -128,6 +130,7 @@ int main()
         double deltaTime = currentTime - lastTime;
 
         glfwPollEvents();
+        Update(deltaTime);
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -135,13 +138,9 @@ int main()
 
         glm::mat4 model, view, projection;
 
-        orbtiCamera.setLookAt(cubePos);
-        orbtiCamera.rotate(gYaw, gPitch);
-        orbtiCamera.setRadious(gRadius);
-
         model = glm::translate(model, cubePos);
-        view = orbtiCamera.GetViewMatrix();
-        projection = glm::perspective(glm::radians(45.0f), (float)gWindowWidth / (float)gWindowHeight, 0.1f, 100.0f);
+        view = fpsCamera.GetViewMatrix();
+        projection = glm::perspective(glm::radians(fpsCamera.getFOV()), (float)gWindowWidth / (float)gWindowHeight, 0.1f, 100.0f);
         
         shaderProgram.use();
         shaderProgram.setUniform("model", model);
@@ -152,7 +151,6 @@ int main()
 
         glBindVertexArray(vao);
         glDrawArrays(GL_TRIANGLES, 0, 36);
-
 
         texture2.bind(0);
         glm::vec3 floorPos;
@@ -208,6 +206,10 @@ bool InitOpenGL()
 
     glfwSetKeyCallback(gWindow, glfw_onKey);
     glfwSetCursorPosCallback(gWindow, glfw_OnMouseMove);
+    glfwSetScrollCallback(gWindow, glfw_OnMouseScroll);
+
+    glfwSetInputMode(gWindow, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    glfwSetCursorPos(gWindow, gWindowWidth / 2.0, gWindowHeight / 2.0);
 
     glewExperimental = GL_TRUE;
     if (glewInit() != GLEW_OK)
@@ -227,7 +229,7 @@ void glfw_onKey(GLFWwindow* window, int key, int scancode, int action, int mode)
 {
     if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
         glfwSetWindowShouldClose(window, GL_TRUE);
-    if (key == GLFW_KEY_W && action == GLFW_PRESS)
+    if (key == GLFW_KEY_F && action == GLFW_PRESS)
     {
         gWireframe = !gWireframe;
 
@@ -247,7 +249,7 @@ void glfw_OnFrameBufferSize(GLFWwindow* window, int width, int height)
 
 void glfw_OnMouseMove(GLFWwindow* window, double posX, double posY)
 {
-    static glm::vec2 lastMousePos = glm::vec2(0, 0);
+    /*static glm::vec2 lastMousePos = glm::vec2(0, 0);
 
     if (glfwGetMouseButton(gWindow, GLFW_MOUSE_BUTTON_LEFT) == 1)
     {
@@ -263,7 +265,40 @@ void glfw_OnMouseMove(GLFWwindow* window, double posX, double posY)
     }
 
     lastMousePos.x = (float)posX;
-    lastMousePos.y = (float)posY;
+    lastMousePos.y = (float)posY;*/
+}
+
+void glfw_OnMouseScroll(GLFWwindow* window, double deltaX, double deltaY)
+{
+    double fov = fpsCamera.getFOV() + deltaY * ZOOM_SENSITIVITY;
+    fov = glm::clamp(fov, 1.0, 120.0);
+
+    fpsCamera.setFOV((float)fov);
+}
+
+void Update(double elapsedTime)
+{
+    double mouseX, mouseY;
+
+    glfwGetCursorPos(gWindow, &mouseX, &mouseY);
+    fpsCamera.rotate((float)(gWindowWidth / 2.0 - mouseX) * MOUSE_SENSITIVITY, (float)(gWindowHeight / 2.0 - mouseY) * MOUSE_SENSITIVITY);
+
+    glfwSetCursorPos(gWindow, gWindowWidth / 2.0, gWindowHeight / 2.0);
+
+    if (glfwGetKey(gWindow, GLFW_KEY_W) == GLFW_PRESS)
+        fpsCamera.move(MOVE_SPEED * (float)elapsedTime * fpsCamera.getLook());
+    else if (glfwGetKey(gWindow, GLFW_KEY_S) == GLFW_PRESS)
+        fpsCamera.move(MOVE_SPEED * (float)elapsedTime * -fpsCamera.getLook());
+
+    if (glfwGetKey(gWindow, GLFW_KEY_A) == GLFW_PRESS)
+        fpsCamera.move(MOVE_SPEED * (float)elapsedTime * -fpsCamera.getRight());
+    else if (glfwGetKey(gWindow, GLFW_KEY_D) == GLFW_PRESS)
+        fpsCamera.move(MOVE_SPEED * (float)elapsedTime * fpsCamera.getRight());
+
+    if (glfwGetKey(gWindow, GLFW_KEY_Z) == GLFW_PRESS)
+        fpsCamera.move(MOVE_SPEED * (float)elapsedTime * fpsCamera.getUp());
+    else if (glfwGetKey(gWindow, GLFW_KEY_X) == GLFW_PRESS)
+        fpsCamera.move(MOVE_SPEED * (float)elapsedTime * -fpsCamera.getUp());
 }
 
 void showFPS(GLFWwindow* window)

@@ -48,6 +48,9 @@
   <ItemGroup>
     <CopyFileToFolders Include="bin\wooden_crate.jpg" />
   </ItemGroup>
+  <ItemGroup>
+    <CopyFileToFolders Include="bin\grid.jpg" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
