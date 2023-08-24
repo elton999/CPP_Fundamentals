@@ -9,6 +9,7 @@
 #include "ShaderProgram.h"
 #include "Texture2D.h"
 #include "Camera.h"
+#include "Mesh.h"
 
 const char* APP_TITLE = "Introduction to Modern OpenGL - Hello Shader";
 int gWindowWidth = 1024;
@@ -20,7 +21,7 @@ bool gFullScreen = false;
 FPSCamera fpsCamera(glm::vec3(0.0f, 0.0f, 5.0f));
 const double ZOOM_SENSITIVITY = -3.0;
 const float MOVE_SPEED = 5.0;
-const float MOUSE_SENSITIVITY = 0.5f;
+const float MOUSE_SENSITIVITY = 0.1f;
 
 void glfw_onKey(GLFWwindow* window, int key, int scancode, int action, int mode);
 void glfw_OnFrameBufferSize(GLFWwindow* window, int width, int height);
@@ -38,86 +39,38 @@ int main()
         return -1;
     }
 
-    GLfloat vert_pos[]
-    {
-        // position		 // tex coords
-
-       // front face
-       -1.0f,  1.0f,  1.0f, 0.0f, 1.0f,
-        1.0f, -1.0f,  1.0f, 1.0f, 0.0f,
-        1.0f,  1.0f,  1.0f, 1.0f, 1.0f,
-       -1.0f,  1.0f,  1.0f, 0.0f, 1.0f,
-       -1.0f, -1.0f,  1.0f, 0.0f, 0.0f,
-        1.0f, -1.0f,  1.0f, 1.0f, 0.0f,
-
-        // back face
-        -1.0f,  1.0f, -1.0f, 0.0f, 1.0f,
-         1.0f, -1.0f, -1.0f, 1.0f, 0.0f,
-         1.0f,  1.0f, -1.0f, 1.0f, 1.0f,
-        -1.0f,  1.0f, -1.0f, 0.0f, 1.0f,
-        -1.0f, -1.0f, -1.0f, 0.0f, 0.0f,
-         1.0f, -1.0f, -1.0f, 1.0f, 0.0f,
-
-         // left face
-         -1.0f,  1.0f, -1.0f, 0.0f, 1.0f,
-         -1.0f, -1.0f,  1.0f, 1.0f, 0.0f,
-         -1.0f,  1.0f,  1.0f, 1.0f, 1.0f,
-         -1.0f,  1.0f, -1.0f, 0.0f, 1.0f,
-         -1.0f, -1.0f, -1.0f, 0.0f, 0.0f,
-         -1.0f, -1.0f,  1.0f, 1.0f, 0.0f,
-
-         // right face
-          1.0f,  1.0f,  1.0f, 0.0f, 1.0f,
-          1.0f, -1.0f, -1.0f, 1.0f, 0.0f,
-          1.0f,  1.0f, -1.0f, 1.0f, 1.0f,
-          1.0f,  1.0f,  1.0f, 0.0f, 1.0f,
-          1.0f, -1.0f,  1.0f, 0.0f, 0.0f,
-          1.0f, -1.0f, -1.0f, 1.0f, 0.0f,
-
-          // top face
-         -1.0f,  1.0f, -1.0f, 0.0f, 1.0f,
-          1.0f,  1.0f,  1.0f, 1.0f, 0.0f,
-          1.0f,  1.0f, -1.0f, 1.0f, 1.0f,
-         -1.0f,  1.0f, -1.0f, 0.0f, 1.0f,
-         -1.0f,  1.0f,  1.0f, 0.0f, 0.0f,
-          1.0f,  1.0f,  1.0f, 1.0f, 0.0f,
-
-          // bottom face
-         -1.0f, -1.0f,  1.0f, 0.0f, 1.0f,
-          1.0f, -1.0f, -1.0f, 1.0f, 0.0f,
-          1.0f, -1.0f,  1.0f, 1.0f, 1.0f,
-         -1.0f, -1.0f,  1.0f, 0.0f, 1.0f,
-         -1.0f, -1.0f, -1.0f, 0.0f, 0.0f,
-          1.0f, -1.0f, -1.0f, 1.0f, 0.0f,
-    };
-
-    glm::vec3 cubePos = glm::vec3(0.0f, 0.0f, -5.0f);
-
-    GLuint vbo, vao;
-
-    glGenBuffers(1, &vbo);
-    glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vert_pos), vert_pos, GL_STATIC_DRAW);
-
-    glGenVertexArrays(1, &vao);
-    glBindVertexArray(vao);
-
-    // position
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), NULL);
-    glEnableVertexAttribArray(0);
-
-    // tex coord
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (GLfloat*)(3 * sizeof(GLfloat)));
-    glEnableVertexAttribArray(1);
-
     ShaderProgram shaderProgram;
     shaderProgram.loadShaders("basic.vert", "basic.frag");
 
-    Texture2D texture1;
-    texture1.loadTexture("wooden_crate.jpg", true);
+    glm::vec3 modelPos[] =
+    {
+        glm::vec3(-2.5f, 1.0f, 0.0f),
+        glm::vec3(2.5f, 1.0f, 0.0f),
+        glm::vec3(0.0f, 0.0f, -2.0f),
+        glm::vec3(0.0f, 0.0f, 0.0f),
+    };
 
-    Texture2D texture2;
-    texture2.loadTexture("grid.jpg", true);
+    glm::vec3 modelScale[]
+    {
+        glm::vec3(1.0f, 1.0f, 1.0f),
+        glm::vec3(1.0f, 1.0f, 1.0f),
+        glm::vec3(1.0f, 1.0f, 1.0f),
+        glm::vec3(10.0f, 0.1f, 10.0f),
+    };
+
+    const int numModels = 4;
+    Mesh mesh[numModels];
+    Texture2D texture[numModels];
+
+    mesh[0].loadOBJ("crate.obj");
+    mesh[1].loadOBJ("woodcrate.obj");
+    mesh[2].loadOBJ("robot.obj");
+    mesh[3].loadOBJ("floor.obj");
+
+    texture[0].loadTexture("crate.jpg", true);
+    texture[1].loadTexture("woodcrate_diffuse.jpg", true);
+    texture[2].loadTexture("robot_diffuse.jpg", true);
+    texture[3].loadTexture("tile_floor.jpg", true);
 
     float cubeAngle = 0.0f;
     double lastTime = glfwGetTime();
@@ -134,39 +87,32 @@ int main()
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        texture1.bind(0);
-
         glm::mat4 model, view, projection;
 
-        model = glm::translate(model, cubePos);
         view = fpsCamera.GetViewMatrix();
         projection = glm::perspective(glm::radians(fpsCamera.getFOV()), (float)gWindowWidth / (float)gWindowHeight, 0.1f, 100.0f);
         
         shaderProgram.use();
-        shaderProgram.setUniform("model", model);
         shaderProgram.setUniform("view", view);
         shaderProgram.setUniform("projection", projection);
 
-        glUniform1i(glGetUniformLocation(shaderProgram.getProgram(), "myTexture1"), 0);
+        for (int i = 0; i < numModels; i++)
+        {
+            model = glm::translate(glm::mat4(), modelPos[i]) * glm::scale(glm::mat4(), modelScale[i]);
+            shaderProgram.setUniform("model", model);
+            
+            texture[i].bind(0);
+            mesh[i].draw();
+            texture[i].unbind(0);
+        }
 
-        glBindVertexArray(vao);
-        glDrawArrays(GL_TRIANGLES, 0, 36);
-
-        texture2.bind(0);
-        glm::vec3 floorPos;
-        model = glm::translate(model, floorPos) * glm::scale(model, glm::vec3(10.0f, 0.0f, 10.0f));
         shaderProgram.setUniform("model", model);
-        glDrawArrays(GL_TRIANGLES, 0, 36);
 
-        glBindVertexArray(0);
 
         glfwSwapBuffers(gWindow);
 
         lastTime = currentTime;
     }
-
-    glDeleteVertexArrays(1, &vao);
-    glDeleteBuffers(1, &vbo);
 
     glfwTerminate();
     return 0;

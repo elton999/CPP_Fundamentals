@@ -27,6 +27,9 @@
     <ClCompile Include="src\Camera.cpp">
       <Filter>Arquivos de Origem</Filter>
     </ClCompile>
+    <ClCompile Include="src\Mesh.cpp">
+      <Filter>Arquivos de Origem</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\ShaderProgram.h">
@@ -39,6 +42,9 @@
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
     <ClInclude Include="src\Camera.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Mesh.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
   </ItemGroup>
@@ -58,5 +64,21 @@
     <CopyFileToFolders Include="bin\grid.jpg">
       <Filter>Arquivos de Recurso</Filter>
     </CopyFileToFolders>
+    <CopyFileToFolders Include="bin\crate.jpg">
+      <Filter>Arquivos de Recurso</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="bin\robot_diffuse.jpg">
+      <Filter>Arquivos de Recurso</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="bin\tile_floor.jpg">
+      <Filter>Arquivos de Recurso</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="bin\woodcrate_diffuse.jpg">
+      <Filter>Arquivos de Recurso</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="bin\crate.obj" />
+    <CopyFileToFolders Include="bin\floor.obj" />
+    <CopyFileToFolders Include="bin\robot.obj" />
+    <CopyFileToFolders Include="bin\woodcrate.obj" />
   </ItemGroup>
 </Project>
