@@ -7,6 +7,9 @@
 #include "GL/glew.h"
 #include "glm/glm.hpp"
 
+#include <assimp/Importer.hpp>
+#include <assimp/scene.h>
+#include <assimp/postprocess.h>
 
 struct Vertex
 {
@@ -21,6 +24,7 @@ public:
 	~Mesh();
 
 	bool loadOBJ(const std::string& filename);
+	bool loadFBX(const std::string& filename);
 	void draw();
 
 private:

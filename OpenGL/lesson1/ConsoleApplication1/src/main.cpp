@@ -6,10 +6,6 @@
 #include "GLFW/glfw3.h"
 #include "glm/gtc/matrix_transform.hpp"
 
-#include <assimp/Importer.hpp>
-#include <assimp/scene.h>
-#include <assimp/postprocess.h>
-
 #include "ShaderProgram.h"
 #include "Texture2D.h"
 #include "Camera.h"
@@ -31,7 +27,6 @@ void glfw_onKey(GLFWwindow* window, int key, int scancode, int action, int mode)
 void glfw_OnFrameBufferSize(GLFWwindow* window, int width, int height);
 void glfw_OnMouseMove(GLFWwindow* window, double posX, double posY);
 void glfw_OnMouseScroll(GLFWwindow* window, double deltaX, double deltaY);
-bool DoTheImportThing(const std::string& pFile);
 void Update(double elapsedTime);
 void showFPS(GLFWwindow* window);
 bool InitOpenGL();
@@ -53,6 +48,7 @@ int main()
         glm::vec3(2.5f, 1.0f, 0.0f),
         glm::vec3(0.0f, 0.0f, -2.0f),
         glm::vec3(0.0f, 0.0f, 0.0f),
+        glm::vec3(4.0f, 3.0f, 0.0f),
     };
 
     glm::vec3 modelScale[]
@@ -61,9 +57,10 @@ int main()
         glm::vec3(1.0f, 1.0f, 1.0f),
         glm::vec3(1.0f, 1.0f, 1.0f),
         glm::vec3(10.0f, 0.1f, 10.0f),
+        glm::vec3(1.0f, 1.0f, 1.0f),
     };
 
-    const int numModels = 4;
+    const int numModels = 5;
     Mesh mesh[numModels];
     Texture2D texture[numModels];
 
@@ -71,13 +68,13 @@ int main()
     mesh[1].loadOBJ("woodcrate.obj");
     mesh[2].loadOBJ("robot.obj");
     mesh[3].loadOBJ("floor.obj");
+    mesh[4].loadFBX("boxTest.fbx");
 
     texture[0].loadTexture("crate.jpg", true);
     texture[1].loadTexture("woodcrate_diffuse.jpg", true);
     texture[2].loadTexture("robot_diffuse.jpg", true);
     texture[3].loadTexture("tile_floor.jpg", true);
-
-    DoTheImportThing("boxTest.fbx");
+    texture[4].loadTexture("crate.jpg", true);
 
     float cubeAngle = 0.0f;
     double lastTime = glfwGetTime();
@@ -227,32 +224,6 @@ void glfw_OnMouseScroll(GLFWwindow* window, double deltaX, double deltaY)
     fov = glm::clamp(fov, 1.0, 120.0);
 
     fpsCamera.setFOV((float)fov);
-}
-
-bool DoTheImportThing(const std::string& pFile) {
-    // Create an instance of the Importer class
-    Assimp::Importer importer;
-
-    // And have it read the given file with some example postprocessing
-    // Usually - if speed is not the most important aspect for you - you'll
-    // probably to request more postprocessing than we do in this example.
-    const aiScene* scene = importer.ReadFile(pFile,
-        aiProcess_CalcTangentSpace |
-        aiProcess_Triangulate |
-        aiProcess_JoinIdenticalVertices |
-        aiProcess_SortByPType);
-
-    // If the import failed, report it
-    if (nullptr == scene) {
-        std::cerr << "Error Import: " << importer.GetErrorString() << std::endl;
-        return false;
-    }
-
-    // Now we can access the file's contents.
-    std::cout << "Import of scene " << pFile << " succeeded." << std::endl;
-
-    // We're done. Everything will be cleaned up by the importer destructor
-    return true;
 }
 
 void Update(double elapsedTime)

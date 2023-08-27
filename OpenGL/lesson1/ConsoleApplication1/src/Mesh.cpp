@@ -13,6 +13,56 @@ Mesh::~Mesh()
     glDeleteBuffers(1, &mVBO);
 }
 
+bool Mesh::loadFBX(const std::string& filename)
+{
+    // Create an instance of the Importer class
+    Assimp::Importer importer;
+
+    // And have it read the given file with some example postprocessing
+    // Usually - if speed is not the most important aspect for you - you'll
+    // probably to request more postprocessing than we do in this example.
+    const aiScene* scene = importer.ReadFile(filename,
+        aiProcess_CalcTangentSpace |
+        aiProcess_Triangulate |
+        aiProcess_JoinIdenticalVertices |
+        aiProcess_SortByPType);
+
+    // If the import failed, report it
+    if (scene)
+    {
+        const aiVector3D Zero3D(0.0f, 0.0f, 0.0f);
+        for (unsigned int i = 0; i < scene->mNumMeshes; i++)
+        {
+            const aiMesh* paiMesh = scene->mMeshes[i];
+
+            for (unsigned int j = 0; j < paiMesh->mNumVertices; j++)
+            {
+                const aiVector3D* pPos = &paiMesh->mVertices[j];
+                const aiVector3D* pTexCoord = paiMesh->HasTextureCoords(0) ? &(paiMesh->mTextureCoords[0][j]) : &Zero3D;
+
+                glm::vec3 vertex = glm::vec3(pPos->x, pPos->y, pPos->z);
+                glm::vec2 uv = glm::vec2(pTexCoord->x, pTexCoord->y);
+
+                Vertex meshVertex;
+                meshVertex.position = vertex;
+                meshVertex.texCoords = uv;
+
+                mVertices.push_back(meshVertex);
+            }
+        }
+    }
+    else
+    {
+        std::cerr << "Error Import: " << importer.GetErrorString() << std::endl;
+        return false;
+    }
+
+    std::cout << "Import of scene " << filename << " succeeded." << std::endl;
+
+    initBuffers();
+    return (mLoaded = true);
+}
+
 bool Mesh::loadOBJ(const std::string& filename)
 {
     std::vector<unsigned int> vertexIndices, uvIndices;
@@ -84,8 +134,6 @@ bool Mesh::loadOBJ(const std::string& filename)
             meshVertex.texCoords = uv;
 
             mVertices.push_back(meshVertex);
-
-
         }
             initBuffers();
             return (mLoaded = true);
