@@ -81,5 +81,9 @@
     <CopyFileToFolders Include="bin\robot.obj" />
     <CopyFileToFolders Include="bin\woodcrate.obj" />
     <CopyFileToFolders Include="bin\boxTest.fbx" />
+    <CopyFileToFolders Include="bin\player.png">
+      <Filter>Arquivos de Recurso</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="bin\player.fbx" />
   </ItemGroup>
 </Project>

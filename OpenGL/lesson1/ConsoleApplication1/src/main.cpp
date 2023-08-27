@@ -68,13 +68,13 @@ int main()
     mesh[1].loadOBJ("woodcrate.obj");
     mesh[2].loadOBJ("robot.obj");
     mesh[3].loadOBJ("floor.obj");
-    mesh[4].loadFBX("boxTest.fbx");
+    mesh[4].loadFBX("player.fbx");
 
     texture[0].loadTexture("crate.jpg", true);
     texture[1].loadTexture("woodcrate_diffuse.jpg", true);
     texture[2].loadTexture("robot_diffuse.jpg", true);
     texture[3].loadTexture("tile_floor.jpg", true);
-    texture[4].loadTexture("crate.jpg", true);
+    texture[4].loadTexture("player.png", true);
 
     float cubeAngle = 0.0f;
     double lastTime = glfwGetTime();

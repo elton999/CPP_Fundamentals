@@ -46,7 +46,6 @@ bool Mesh::loadFBX(const std::string& filename)
 
                 tempVertices.push_back(vertex);
                 tempUVs.push_back(uv);
-
             }
 
             for (unsigned int j = 0; j < paiMesh->mNumFaces; j++)
