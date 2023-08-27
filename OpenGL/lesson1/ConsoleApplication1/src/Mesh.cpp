@@ -27,13 +27,14 @@ bool Mesh::loadFBX(const std::string& filename)
         aiProcess_JoinIdenticalVertices |
         aiProcess_SortByPType);
 
-    // If the import failed, report it
     if (scene)
     {
         const aiVector3D Zero3D(0.0f, 0.0f, 0.0f);
         for (unsigned int i = 0; i < scene->mNumMeshes; i++)
         {
             const aiMesh* paiMesh = scene->mMeshes[i];
+            std::vector<glm::vec3> tempVertices;
+            std::vector<glm::vec2> tempUVs;
 
             for (unsigned int j = 0; j < paiMesh->mNumVertices; j++)
             {
@@ -43,11 +44,20 @@ bool Mesh::loadFBX(const std::string& filename)
                 glm::vec3 vertex = glm::vec3(pPos->x, pPos->y, pPos->z);
                 glm::vec2 uv = glm::vec2(pTexCoord->x, pTexCoord->y);
 
-                Vertex meshVertex;
-                meshVertex.position = vertex;
-                meshVertex.texCoords = uv;
+                tempVertices.push_back(vertex);
+                tempUVs.push_back(uv);
 
-                mVertices.push_back(meshVertex);
+            }
+
+            for (unsigned int j = 0; j < paiMesh->mNumFaces; j++)
+            {
+                for (unsigned int k = 0; k < 3; k++)
+                {
+                    Vertex meshVertex;
+                    meshVertex.position = tempVertices[paiMesh->mFaces[j].mIndices[k]];
+                    meshVertex.texCoords = tempUVs[paiMesh->mFaces[j].mIndices[k]];
+                    mVertices.push_back(meshVertex);
+                }
             }
         }
     }
