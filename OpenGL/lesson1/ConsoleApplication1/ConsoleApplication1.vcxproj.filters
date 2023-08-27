@@ -80,5 +80,6 @@
     <CopyFileToFolders Include="bin\floor.obj" />
     <CopyFileToFolders Include="bin\robot.obj" />
     <CopyFileToFolders Include="bin\woodcrate.obj" />
+    <CopyFileToFolders Include="bin\boxTest.fbx" />
   </ItemGroup>
 </Project>

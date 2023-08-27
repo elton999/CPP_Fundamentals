@@ -31,6 +31,7 @@ void glfw_onKey(GLFWwindow* window, int key, int scancode, int action, int mode)
 void glfw_OnFrameBufferSize(GLFWwindow* window, int width, int height);
 void glfw_OnMouseMove(GLFWwindow* window, double posX, double posY);
 void glfw_OnMouseScroll(GLFWwindow* window, double deltaX, double deltaY);
+bool DoTheImportThing(const std::string& pFile);
 void Update(double elapsedTime);
 void showFPS(GLFWwindow* window);
 bool InitOpenGL();
@@ -75,6 +76,8 @@ int main()
     texture[1].loadTexture("woodcrate_diffuse.jpg", true);
     texture[2].loadTexture("robot_diffuse.jpg", true);
     texture[3].loadTexture("tile_floor.jpg", true);
+
+    DoTheImportThing("boxTest.fbx");
 
     float cubeAngle = 0.0f;
     double lastTime = glfwGetTime();
@@ -224,6 +227,32 @@ void glfw_OnMouseScroll(GLFWwindow* window, double deltaX, double deltaY)
     fov = glm::clamp(fov, 1.0, 120.0);
 
     fpsCamera.setFOV((float)fov);
+}
+
+bool DoTheImportThing(const std::string& pFile) {
+    // Create an instance of the Importer class
+    Assimp::Importer importer;
+
+    // And have it read the given file with some example postprocessing
+    // Usually - if speed is not the most important aspect for you - you'll
+    // probably to request more postprocessing than we do in this example.
+    const aiScene* scene = importer.ReadFile(pFile,
+        aiProcess_CalcTangentSpace |
+        aiProcess_Triangulate |
+        aiProcess_JoinIdenticalVertices |
+        aiProcess_SortByPType);
+
+    // If the import failed, report it
+    if (nullptr == scene) {
+        std::cerr << "Error Import: " << importer.GetErrorString() << std::endl;
+        return false;
+    }
+
+    // Now we can access the file's contents.
+    std::cout << "Import of scene " << pFile << " succeeded." << std::endl;
+
+    // We're done. Everything will be cleaned up by the importer destructor
+    return true;
 }
 
 void Update(double elapsedTime)
