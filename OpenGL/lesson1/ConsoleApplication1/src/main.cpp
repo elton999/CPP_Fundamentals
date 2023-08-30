@@ -57,7 +57,16 @@ int main()
         glm::vec3(1.0f, 1.0f, 1.0f),
         glm::vec3(1.0f, 1.0f, 1.0f),
         glm::vec3(10.0f, 0.1f, 10.0f),
-        glm::vec3(1.0f, 1.0f, 1.0f),
+        glm::vec3(0.5f, 0.5f, 0.5f),
+    };
+
+    glm::vec3 modelRotation[]
+    {
+         glm::vec3(0.0f, 0.0f, 0.0f),
+         glm::vec3(0.0f, 0.0f, 0.0f),
+         glm::vec3(0.0f, 0.0f, 0.0f),
+         glm::vec3(0.0f, 0.0f, 0.0f),
+         glm::vec3(-90.0f, 0.0f, 0.0f),
     };
 
     const int numModels = 5;
@@ -103,6 +112,9 @@ int main()
         for (int i = 0; i < numModels; i++)
         {
             model = glm::translate(glm::mat4(), modelPos[i]) * glm::scale(glm::mat4(), modelScale[i]);
+            model = glm::rotate(model, glm::radians(modelRotation[i].x), glm::vec3(1.0f, 0.0f, 0.0f));
+            model = glm::rotate(model, glm::radians(modelRotation[i].y), glm::vec3(0.0f, 1.0f, 0.0f));
+            model = glm::rotate(model, glm::radians(modelRotation[i].z), glm::vec3(0.0f, 0.0f, 1.0f));
             shaderProgram.setUniform("model", model);
             
             texture[i].bind(0);
