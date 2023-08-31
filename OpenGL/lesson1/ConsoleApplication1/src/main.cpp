@@ -10,6 +10,7 @@
 #include "Texture2D.h"
 #include "Camera.h"
 #include "Mesh.h"
+#include "GameObject.h"
 
 const char* APP_TITLE = "Introduction to Modern OpenGL - Hello Shader";
 int gWindowWidth = 1024;
@@ -42,48 +43,24 @@ int main()
     ShaderProgram shaderProgram;
     shaderProgram.loadShaders("basic.vert", "basic.frag");
 
-    glm::vec3 modelPos[] =
+    const int numModels = 4;
+    GameObject scene[]
     {
-        glm::vec3(-2.5f, 1.0f, 0.0f),
-        glm::vec3(2.5f, 1.0f, 0.0f),
-        glm::vec3(0.0f, 0.0f, -2.0f),
-        glm::vec3(0.0f, 0.0f, 0.0f),
-        glm::vec3(4.0f, 3.0f, 0.0f),
+        GameObject(&shaderProgram, "crate.obj", "crate.jpg"),
+        GameObject(&shaderProgram, "woodcrate.obj", "woodcrate_diffuse.jpg"),
+        GameObject(&shaderProgram, "robot.obj", "robot_diffuse.jpg"),
+        GameObject(&shaderProgram, "floor.obj", "tile_floor.jpg"),
     };
 
-    glm::vec3 modelScale[]
-    {
-        glm::vec3(1.0f, 1.0f, 1.0f),
-        glm::vec3(1.0f, 1.0f, 1.0f),
-        glm::vec3(1.0f, 1.0f, 1.0f),
-        glm::vec3(10.0f, 0.1f, 10.0f),
-        glm::vec3(0.5f, 0.5f, 0.5f),
-    };
-
-    glm::vec3 modelRotation[]
-    {
-         glm::vec3(0.0f, 0.0f, 0.0f),
-         glm::vec3(0.0f, 0.0f, 0.0f),
-         glm::vec3(0.0f, 0.0f, 0.0f),
-         glm::vec3(0.0f, 0.0f, 0.0f),
-         glm::vec3(-90.0f, 0.0f, 0.0f),
-    };
-
-    const int numModels = 5;
-    Mesh mesh[numModels];
-    Texture2D texture[numModels];
-
-    mesh[0].loadOBJ("crate.obj");
-    mesh[1].loadOBJ("woodcrate.obj");
-    mesh[2].loadOBJ("robot.obj");
-    mesh[3].loadOBJ("floor.obj");
-    mesh[4].loadFBX("player.fbx");
-
-    texture[0].loadTexture("crate.jpg", true);
-    texture[1].loadTexture("woodcrate_diffuse.jpg", true);
-    texture[2].loadTexture("robot_diffuse.jpg", true);
-    texture[3].loadTexture("tile_floor.jpg", true);
-    texture[4].loadTexture("player.png", true);
+    scene[0].Position = glm::vec3(-2.5f, 1.0f, 0.0f);
+    scene[1].Position = glm::vec3(2.5f, 1.0f, 0.0f);
+    scene[2].Position = glm::vec3(0.0f, 0.0f, -2.0f);
+    scene[3].Position = glm::vec3(0.0f, 0.0f, 0.0f);
+    
+    scene[0].Scale = glm::vec3(1.0f, 1.0f, 1.0f);
+    scene[1].Scale = glm::vec3(1.0f, 1.0f, 1.0f);
+    scene[2].Scale = glm::vec3(1.0f, 1.0f, 1.0f);
+    scene[3].Scale = glm::vec3(10.0f, 0.1f, 10.0f);
 
     float cubeAngle = 0.0f;
     double lastTime = glfwGetTime();
@@ -100,7 +77,7 @@ int main()
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        glm::mat4 model, view, projection;
+        glm::mat4 view, projection;
 
         view = fpsCamera.GetViewMatrix();
         projection = glm::perspective(glm::radians(fpsCamera.getFOV()), (float)gWindowWidth / (float)gWindowHeight, 0.1f, 100.0f);
@@ -111,19 +88,10 @@ int main()
 
         for (int i = 0; i < numModels; i++)
         {
-            model = glm::translate(glm::mat4(), modelPos[i]) * glm::scale(glm::mat4(), modelScale[i]);
-            model = glm::rotate(model, glm::radians(modelRotation[i].x), glm::vec3(1.0f, 0.0f, 0.0f));
-            model = glm::rotate(model, glm::radians(modelRotation[i].y), glm::vec3(0.0f, 1.0f, 0.0f));
-            model = glm::rotate(model, glm::radians(modelRotation[i].z), glm::vec3(0.0f, 0.0f, 1.0f));
-            shaderProgram.setUniform("model", model);
-            
-            texture[i].bind(0);
-            mesh[i].draw();
-            texture[i].unbind(0);
+            scene[i].Update(deltaTime);
+            scene[i].UpdateData();
+            scene[i].Draw();
         }
-
-        shaderProgram.setUniform("model", model);
-
 
         glfwSwapBuffers(gWindow);
 
