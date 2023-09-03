@@ -79,7 +79,7 @@ int main()
 
         for (int i = 0; i < numModels; i++)
         {
-            shaderProgram.setUniform("gDisplayBoneIndex", scene[i].m_mesh.m_BoneNameToIndexMap["Head"]);
+            shaderProgram.setUniform("gDisplayBoneIndex", scene[i].m_mesh.m_BoneNameToIndexMap["Shoulder.L"]);
             scene[i].Update(deltaTime);
             scene[i].UpdateData();
             scene[i].Draw();

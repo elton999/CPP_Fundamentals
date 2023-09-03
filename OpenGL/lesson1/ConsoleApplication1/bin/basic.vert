@@ -22,12 +22,12 @@ void main()
     {
         if(boneIDs[i] == gDisplayBoneIndex)
         {
-            if(weights[i] <= 0.2f)
-                colorOut = vec4(0.0f, 1.0f, 0.0f, 1.0f);
-            else if(weights[i] <= 0.5f)
-                colorOut = vec4(1.0f, 1.0f, 0.0f, 1.0f);
-            else if(weights[i] <= 1.0f)
-                colorOut = vec4(1.0f, 0.0f, 0.0f, 1.0f);
+            if (weights[i] >= 0.7f)
+                colorOut = vec4(1.0f, 0.0f, 0.0f, 1.0f) * weights[i];
+            else if (weights[i] >= 0.4f && weights[i] <= 0.6f)
+                colorOut = vec4(0.0f, 1.0f, 0.0f, 1.0f) * weights[i];
+            else if (weights[i] >= 0.1f)
+                colorOut = vec4(1.0f, 1.0f, 0.0f, 1.0f) * weights[i];
         }
     }
 
