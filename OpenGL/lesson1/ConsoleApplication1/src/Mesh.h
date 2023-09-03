@@ -11,10 +11,16 @@
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
 
+#define MAX_BONE_INFLUENCE 4
+
 struct Vertex
 {
 	glm::vec3 position;
 	glm::vec2 texCoords;
+	//bone indexes which will influence this vertex
+	GLint m_BoneIDs[MAX_BONE_INFLUENCE];
+	//weights from each bone
+	GLfloat m_Weights[MAX_BONE_INFLUENCE];
 };
 
 class Mesh

@@ -3,7 +3,8 @@
 GameObject::GameObject(ShaderProgram* shader, string mesh_path, string texture_path)
 {
     m_shaderProgram = shader;
-    m_mesh.loadOBJ(mesh_path);
+    //m_mesh.loadOBJ(mesh_path);
+    m_mesh.loadFBX(mesh_path);
     m_texture.loadTexture(texture_path);
 }
 

@@ -43,24 +43,15 @@ int main()
     ShaderProgram shaderProgram;
     shaderProgram.loadShaders("basic.vert", "basic.frag");
 
-    const int numModels = 4;
+    const int numModels = 1;
     GameObject scene[]
     {
-        GameObject(&shaderProgram, "crate.obj", "crate.jpg"),
-        GameObject(&shaderProgram, "woodcrate.obj", "woodcrate_diffuse.jpg"),
-        GameObject(&shaderProgram, "robot.obj", "robot_diffuse.jpg"),
-        GameObject(&shaderProgram, "floor.obj", "tile_floor.jpg"),
+        GameObject(&shaderProgram, "player.fbx", "player.png"),
     };
 
     scene[0].Position = glm::vec3(-2.5f, 1.0f, 0.0f);
-    scene[1].Position = glm::vec3(2.5f, 1.0f, 0.0f);
-    scene[2].Position = glm::vec3(0.0f, 0.0f, -2.0f);
-    scene[3].Position = glm::vec3(0.0f, 0.0f, 0.0f);
-    
     scene[0].Scale = glm::vec3(1.0f, 1.0f, 1.0f);
-    scene[1].Scale = glm::vec3(1.0f, 1.0f, 1.0f);
-    scene[2].Scale = glm::vec3(1.0f, 1.0f, 1.0f);
-    scene[3].Scale = glm::vec3(10.0f, 0.1f, 10.0f);
+    scene[0].Rotation = glm::vec3(-90.0f, 0.0f, 0.0f);
 
     float cubeAngle = 0.0f;
     double lastTime = glfwGetTime();

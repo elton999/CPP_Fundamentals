@@ -58,7 +58,15 @@ bool Mesh::loadFBX(const std::string& filename)
                     mVertices.push_back(meshVertex);
                 }
             }
+
+            for (int boneIndex = 0; boneIndex < paiMesh->mNumBones; boneIndex++)
+            {
+                int BoneID = -1;
+                std::string boneName = paiMesh->mBones[boneIndex]->mName.C_Str();
+                std::cout << boneName << std::endl;
+            }
         }
+
     }
     else
     {
@@ -171,11 +179,11 @@ void Mesh::initBuffers()
     glBindVertexArray(mVAO);
 
     // position
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), NULL);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, (5 + MAX_BONE_INFLUENCE) * sizeof(GLfloat) + MAX_BONE_INFLUENCE * sizeof(GLint), NULL);
     glEnableVertexAttribArray(0);
 
     // tex coord
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (GLfloat*)(3 * sizeof(GLfloat)));
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, (5 + MAX_BONE_INFLUENCE) * sizeof(GLfloat) + MAX_BONE_INFLUENCE * sizeof(GLint), (GLfloat*)(3 * sizeof(GLfloat)));
     glEnableVertexAttribArray(1);
 
     glBindVertexArray(0);
