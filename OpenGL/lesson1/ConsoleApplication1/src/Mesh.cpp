@@ -53,20 +53,62 @@ bool Mesh::loadFBX(const std::string& filename)
                 for (unsigned int k = 0; k < 3; k++)
                 {
                     Vertex meshVertex;
-                    meshVertex.position = tempVertices[paiMesh->mFaces[j].mIndices[k]];
-                    meshVertex.texCoords = tempUVs[paiMesh->mFaces[j].mIndices[k]];
+                    meshVertex.vertexId = paiMesh->mFaces[j].mIndices[k];
+                    meshVertex.position = tempVertices[meshVertex.vertexId];
+                    meshVertex.texCoords = tempUVs[meshVertex.vertexId];
+                    // setting invalid default id
+                    for (int boneIndex = 0; boneIndex < MAX_BONE_INFLUENCE; boneIndex++)
+                    {
+                        meshVertex.m_BoneIDs[boneIndex] = -1;
+                    }
                     mVertices.push_back(meshVertex);
                 }
             }
 
             for (int boneIndex = 0; boneIndex < paiMesh->mNumBones; boneIndex++)
             {
-                int BoneID = -1;
+                GLint BoneID = -1;
                 std::string boneName = paiMesh->mBones[boneIndex]->mName.C_Str();
                 std::cout << boneName << std::endl;
+
+                if (m_BoneNameToIndexMap.find(boneName) == m_BoneNameToIndexMap.end())
+                {
+                    BoneInfo newBoneInfo;
+                    newBoneInfo.id = m_BoneCounter;
+                    BoneID = m_BoneCounter;
+                    m_BoneNameToIndexMap[boneName] = BoneID;
+                    m_BoneCounter++;
+                }
+                else
+                {
+                    BoneID = m_BoneNameToIndexMap[boneName];
+                }
+
+                auto weights = paiMesh->mBones[boneIndex]->mWeights;
+                int numWeights = paiMesh->mBones[boneIndex]->mNumWeights;
+                for (int weightIndex = 0; weightIndex < numWeights; weightIndex++)
+                {
+                   GLint vertexId = weights[weightIndex].mVertexId;
+                   float weight = weights[weightIndex].mWeight;
+
+                    for (int vertexIndex = 0; vertexIndex < mVertices.size(); vertexIndex++)
+                    {
+                        if (mVertices[vertexIndex].vertexId == vertexId)
+                        {
+                            for (int i = 0; i < MAX_BONE_INFLUENCE; ++i)
+                            {
+                                if (mVertices[vertexIndex].m_BoneIDs[i] < 0)
+                                {
+                                    mVertices[vertexIndex].m_Weights[i] = weight;
+                                    mVertices[vertexIndex].m_BoneIDs[i] = BoneID;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
             }
         }
-
     }
     else
     {
@@ -179,12 +221,16 @@ void Mesh::initBuffers()
     glBindVertexArray(mVAO);
 
     // position
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, (5 + MAX_BONE_INFLUENCE) * sizeof(GLfloat) + MAX_BONE_INFLUENCE * sizeof(GLint), NULL);
     glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), NULL);
 
     // tex coord
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, (5 + MAX_BONE_INFLUENCE) * sizeof(GLfloat) + MAX_BONE_INFLUENCE * sizeof(GLint), (GLfloat*)(3 * sizeof(GLfloat)));
     glEnableVertexAttribArray(1);
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLfloat*)(3 * sizeof(GLfloat)));
+
+    // bones IDs
+    glEnableVertexAttribArray(2);
+    glVertexAttribIPointer(2, 4, GL_INT, sizeof(Vertex), (GLfloat*)(5 * sizeof(GLfloat))); // to work with int use a diferent method
 
     glBindVertexArray(0);
 }

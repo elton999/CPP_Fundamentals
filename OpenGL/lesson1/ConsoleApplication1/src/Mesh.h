@@ -3,6 +3,8 @@
 
 #include <vector>
 #include <string>
+#include <map>
+#include <iostream>
 
 #include "GL/glew.h"
 #include "glm/glm.hpp"
@@ -21,6 +23,17 @@ struct Vertex
 	GLint m_BoneIDs[MAX_BONE_INFLUENCE];
 	//weights from each bone
 	GLfloat m_Weights[MAX_BONE_INFLUENCE];
+	GLint vertexId;
+};
+
+struct BoneInfo
+{
+	/*id is index in finalBoneMatrices*/
+	int id;
+
+	/*offset matrix transforms vertex from model space to bone space*/
+	glm::mat4 offset;
+
 };
 
 class Mesh
@@ -32,6 +45,9 @@ public:
 	bool loadOBJ(const std::string& filename);
 	bool loadFBX(const std::string& filename);
 	void draw();
+
+	std::map<std::string, GLint> m_BoneNameToIndexMap;
+	GLint m_BoneCounter{0};
 
 private:
 	void initBuffers();
