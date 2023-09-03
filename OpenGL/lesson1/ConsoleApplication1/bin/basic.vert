@@ -17,12 +17,17 @@ out vec4 colorOut;
 
 void main()
 {
-    colorOut = vec4(0.1f);
+    colorOut = vec4(0.0f, 0.0f, 1.0f, 1.0f);
     for(int i = 0 ; i < MAX_BONE_INFLUENCE; i++)
     {
-        if(boneIDs[i] == 6)
+        if(boneIDs[i] == gDisplayBoneIndex)
         {
-            colorOut = vec4(1.0f);
+            if(weights[i] <= 0.2f)
+                colorOut = vec4(0.0f, 1.0f, 0.0f, 1.0f);
+            else if(weights[i] <= 0.5f)
+                colorOut = vec4(1.0f, 1.0f, 0.0f, 1.0f);
+            else if(weights[i] <= 1.0f)
+                colorOut = vec4(1.0f, 0.0f, 0.0f, 1.0f);
         }
     }
 

@@ -232,5 +232,8 @@ void Mesh::initBuffers()
     glEnableVertexAttribArray(2);
     glVertexAttribIPointer(2, 4, GL_INT, sizeof(Vertex), (GLfloat*)(5 * sizeof(GLfloat))); // to work with int use a diferent method
 
+    glEnableVertexAttribArray(3);
+    glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLfloat*)(5 * sizeof(GLfloat) + 4 * sizeof(GLint)));
+
     glBindVertexArray(0);
 }
