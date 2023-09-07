@@ -26,7 +26,7 @@ void main()
                 colorOut = vec4(1.0f, 0.0f, 0.0f, 1.0f) * weights[i];
             else if (weights[i] >= 0.4f && weights[i] <= 0.6f)
                 colorOut = vec4(0.0f, 1.0f, 0.0f, 1.0f) * weights[i];
-            else if (weights[i] >= 0.1f)
+            else if (weights[i] > 0.0f)
                 colorOut = vec4(1.0f, 1.0f, 0.0f, 1.0f) * weights[i];
         }
     }
