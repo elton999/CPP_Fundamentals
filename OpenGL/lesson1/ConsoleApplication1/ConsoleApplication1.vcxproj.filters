@@ -64,32 +64,28 @@
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
-    <CopyFileToFolders Include="bin\wooden_crate.jpg">
+    <CopyFileToFolders Include="content\crate.jpg">
       <Filter>Arquivos de Recurso</Filter>
     </CopyFileToFolders>
-    <CopyFileToFolders Include="bin\grid.jpg">
+    <CopyFileToFolders Include="content\grid.jpg">
       <Filter>Arquivos de Recurso</Filter>
     </CopyFileToFolders>
-    <CopyFileToFolders Include="bin\crate.jpg">
+    <CopyFileToFolders Include="content\robot_diffuse.jpg">
       <Filter>Arquivos de Recurso</Filter>
     </CopyFileToFolders>
-    <CopyFileToFolders Include="bin\robot_diffuse.jpg">
+    <CopyFileToFolders Include="content\player.png">
       <Filter>Arquivos de Recurso</Filter>
     </CopyFileToFolders>
-    <CopyFileToFolders Include="bin\tile_floor.jpg">
+    <CopyFileToFolders Include="content\tile_floor.jpg">
       <Filter>Arquivos de Recurso</Filter>
     </CopyFileToFolders>
-    <CopyFileToFolders Include="bin\woodcrate_diffuse.jpg">
+    <CopyFileToFolders Include="content\woodcrate_diffuse.jpg">
       <Filter>Arquivos de Recurso</Filter>
     </CopyFileToFolders>
-    <CopyFileToFolders Include="bin\crate.obj" />
-    <CopyFileToFolders Include="bin\floor.obj" />
-    <CopyFileToFolders Include="bin\robot.obj" />
-    <CopyFileToFolders Include="bin\woodcrate.obj" />
-    <CopyFileToFolders Include="bin\boxTest.fbx" />
-    <CopyFileToFolders Include="bin\player.png">
+    <CopyFileToFolders Include="content\wooden_crate.jpg">
       <Filter>Arquivos de Recurso</Filter>
     </CopyFileToFolders>
-    <CopyFileToFolders Include="bin\player.fbx" />
+    <CopyFileToFolders Include="content\player.fbx" />
+    <CopyFileToFolders Include="content\boxTest.fbx" />
   </ItemGroup>
 </Project>
