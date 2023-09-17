@@ -1,5 +1,6 @@
 #include <iostream>
 #include <sstream>
+#include <vector>
 
 #define GLEW_STATIC
 #include "GL/glew.h"
@@ -42,19 +43,22 @@ int main()
 
     ShaderProgram shaderProgram;
     shaderProgram.loadShaders("basic.vert", "basic.frag");
+    GameObject* player = new GameObject(&shaderProgram, "boxTest.fbx", "player.png");
 
     const int numModels = 1;
-    GameObject scene[]
+    GameObject* scene[]
     {
-        GameObject(&shaderProgram, "player.fbx", "player.png"),
+        player,
     };
 
-    scene[0].Position = glm::vec3(-2.5f, 1.0f, 0.0f);
-    scene[0].Scale = glm::vec3(1.0f, 1.0f, 1.0f);
-    scene[0].Rotation = glm::vec3(-90.0f, 0.0f, 0.0f);
+    scene[0]->Position = glm::vec3(-2.5f, 1.0f, 0.0f);
+    scene[0]->Scale = glm::vec3(1.0f, 1.0f, 1.0f);
+    scene[0]->Rotation = glm::vec3(-90.0f, 0.0f, 0.0f);
 
     float cubeAngle = 0.0f;
     double lastTime = glfwGetTime();
+
+    float totalTimer = 0;
 
     while (!glfwWindowShouldClose(gWindow))
     {
@@ -79,14 +83,20 @@ int main()
 
         for (int i = 0; i < numModels; i++)
         {
-            shaderProgram.setUniform("gDisplayBoneIndex", scene[i].m_mesh.m_BoneNameToIndexMap["Shoulder.L"]);
-            scene[i].Update(deltaTime);
-            scene[i].UpdateData();
-            scene[i].Draw();
+            std::vector<glm::mat4> transforms;
+            shaderProgram.setUniform("gDisplayBoneIndex", scene[i]->m_mesh.m_BoneNameToIndexMap["Bone.001"]);
+            scene[i]->m_mesh.BoneTransform(totalTimer, transforms);
+            for(unsigned transformIndex = 0; transformIndex < transforms.size(); transformIndex++)
+                if(transformIndex < 200)
+                    shaderProgram.setUniform(std::string("gBones["+ std::to_string(transformIndex) + "]").c_str(), transforms[transformIndex]);
+            scene[i]->Update(deltaTime);
+            scene[i]->UpdateData();
+            scene[i]->Draw();
         }
 
         glfwSwapBuffers(gWindow);
 
+        totalTimer += deltaTime;
         lastTime = currentTime;
     }
 

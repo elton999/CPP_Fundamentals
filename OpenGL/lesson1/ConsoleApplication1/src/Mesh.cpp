@@ -2,6 +2,7 @@
 #include <iostream>
 #include <sstream>
 #include <fstream>
+#include "AssimpGLMHelpers.h"
 
 Mesh::Mesh()
 	: mLoaded(0)
@@ -15,24 +16,26 @@ Mesh::~Mesh()
 
 bool Mesh::loadFBX(const std::string& filename)
 {
-    // Create an instance of the Importer class
-    Assimp::Importer importer;
 
     // And have it read the given file with some example postprocessing
     // Usually - if speed is not the most important aspect for you - you'll
     // probably to request more postprocessing than we do in this example.
-    const aiScene* scene = importer.ReadFile(filename,
+    pScene = Importer.ReadFile(filename,
         aiProcess_CalcTangentSpace |
         aiProcess_Triangulate |
         aiProcess_JoinIdenticalVertices |
-        aiProcess_SortByPType);
+        aiProcess_SortByPType
+    );
 
-    if (scene)
+    if (pScene)
     {
+        m_GlobalInverseTransform = pScene->mRootNode->mTransformation;
+        m_GlobalInverseTransform = m_GlobalInverseTransform.Inverse();
+
         const aiVector3D Zero3D(0.0f, 0.0f, 0.0f);
-        for (unsigned int i = 0; i < scene->mNumMeshes; i++)
+        for (unsigned int i = 0; i < pScene->mNumMeshes; i++)
         {
-            const aiMesh* paiMesh = scene->mMeshes[i];
+            const aiMesh* paiMesh = pScene->mMeshes[i];
             std::vector<glm::vec3> tempVertices;
             std::vector<glm::vec2> tempUVs;
 
@@ -99,6 +102,7 @@ bool Mesh::loadFBX(const std::string& filename)
                             {
                                 if (mVertices[vertexIndex].m_BoneIDs[i] < 0)
                                 {
+                                    std::cout << "bone name: " << std::string(paiMesh->mBones[boneIndex]->mName.data) << "vertex index: " << std::to_string(vertexIndex) <<  " weight: " << std::to_string(weight) << std::endl;
                                     mVertices[vertexIndex].m_Weights[i] = weight;
                                     mVertices[vertexIndex].m_BoneIDs[i] = BoneID;
                                     break;
@@ -112,7 +116,7 @@ bool Mesh::loadFBX(const std::string& filename)
     }
     else
     {
-        std::cerr << "Error Import: " << importer.GetErrorString() << std::endl;
+        std::cerr << "Error Import: " << Importer.GetErrorString() << std::endl;
         return false;
     }
 
@@ -199,6 +203,88 @@ bool Mesh::loadOBJ(const std::string& filename)
 
     }
         return false;
+}
+
+void Mesh::BoneTransform(float timeInSeconds, std::vector<glm::mat4>& Transforms)
+{
+    glm::mat4 Identity =  glm::mat4();
+
+    float ticksPerSecond = (float)(pScene->mAnimations[0]->mTicksPerSecond != 0 ? pScene->mAnimations[0]->mTicksPerSecond : 25.0f);
+    float timeInTicks = timeInSeconds * ticksPerSecond;
+    float animationTime = fmod(timeInTicks, pScene->mAnimations[0]->mDuration);
+
+    ReadNodeHierarchy(animationTime, pScene->mRootNode, Identity);
+}
+
+void Mesh::ReadNodeHierarchy(float animationTime, const aiNode* pNode, const glm::mat4& parentTransform)
+{
+    std::string nodeName(pNode->mName.data);
+    const aiAnimation* pAnimation = pScene->mAnimations[0];
+
+    glm::mat4 nodeTransformation = AssimpGLMHelpers::ConvertMatrixToGLMFormat(pNode->mTransformation);
+
+    
+    const aiNodeAnim* pNodeAnim = FindNodeAnim(pAnimation, nodeName);
+
+    if (pNodeAnim)
+    {
+        // Interpolate rotation and generate rotation transformation matrix
+        aiQuaternion rotationQ;
+        if(pNodeAnim->mNumRotationKeys > 0)
+            CalcInterpolatedRotation(rotationQ, animationTime, pNodeAnim);
+        glm::mat4 rotationQuat = AssimpGLMHelpers::ConvertMatrixToGLMFormat(rotationQ.GetMatrix());
+
+        nodeTransformation = rotationQuat;
+    }
+
+    glm::mat4 globalTransformation = parentTransform * nodeTransformation;
+
+    for (unsigned int i = 0; i < pNode->mNumChildren; i++)
+        ReadNodeHierarchy(animationTime, pNode->mChildren[i], globalTransformation);
+}
+
+aiNodeAnim* Mesh::FindNodeAnim(const aiAnimation* pAnimation, std::string nodeName)
+{
+    for (unsigned int i = 0; i < pAnimation->mNumChannels; i++)
+    {
+        std::string nameChannel(pAnimation->mChannels[i]->mNodeName.data);
+        if (nameChannel == nodeName)
+            return pAnimation->mChannels[i];
+    }
+}
+
+void Mesh::CalcInterpolatedRotation(aiQuaternion& out, float animationTime, const aiNodeAnim* pNodeAnim)
+{
+    if (pNodeAnim->mNumRotationKeys == 1)
+    {
+        out = pNodeAnim->mRotationKeys[0].mValue;
+        return;
+    }
+
+    unsigned int rotationIndex = FindRotation(animationTime, pNodeAnim);
+    unsigned int nextRotatioIndex = (rotationIndex + 1);
+    assert(nextRotatioIndex < pNodeAnim->mNumPositionKeys);
+    float deltaTime = pNodeAnim->mRotationKeys[nextRotatioIndex].mTime - pNodeAnim->mRotationKeys[rotationIndex].mTime;
+    float factor = (animationTime - (float)pNodeAnim->mRotationKeys[rotationIndex].mTime) / deltaTime;
+    assert(factor >= 0.0f && factor <= 1.0f);
+    const aiQuaternion& startrotationQ = pNodeAnim->mRotationKeys[rotationIndex].mValue;
+    const aiQuaternion& endRotationQ = pNodeAnim->mRotationKeys[nextRotatioIndex].mValue;
+
+    aiQuaternion::Interpolate(out, startrotationQ, endRotationQ, factor);
+    out = out.Normalize();
+}
+
+unsigned int Mesh::FindRotation(float animationTime, const aiNodeAnim* pNodeAnim)
+{
+    assert(pNodeAnim->mNumRotationKeys > 0);
+    for (unsigned int i = 0; i < pNodeAnim->mNumRotationKeys - 1; i++)
+    {
+        if (animationTime < (float)pNodeAnim->mRotationKeys[i + 1].mTime)
+        {
+            return i;
+        }
+    }
+    assert(0);
 }
 
 void Mesh::draw()

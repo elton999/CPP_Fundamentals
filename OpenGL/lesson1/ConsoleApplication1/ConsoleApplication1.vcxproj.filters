@@ -53,6 +53,9 @@
     <ClInclude Include="src\GameObject.h">
       <Filter>Arquivos de Cabeçalho</Filter>
     </ClInclude>
+    <ClInclude Include="src\AssimpGLMHelpers.h">
+      <Filter>Arquivos de Cabeçalho</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="bin\basic.vert" />

@@ -8,6 +8,7 @@
 
 #include "GL/glew.h"
 #include "glm/glm.hpp"
+#include "glm/gtc/type_ptr.hpp"
 
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
@@ -46,8 +47,18 @@ public:
 	bool loadFBX(const std::string& filename);
 	void draw();
 
+	void BoneTransform(float timeInSeconds, std::vector<glm::mat4>& Transforms);
+	void ReadNodeHierarchy(float animationTime, const aiNode* pNode, const glm::mat4& parentTransform);
+	aiNodeAnim* FindNodeAnim(const aiAnimation* pAnimation, std::string nodeName);
+
+	void CalcInterpolatedRotation(aiQuaternion& out, float animationTime, const aiNodeAnim* pNodeAnim);
+	unsigned int FindRotation(float animationTime, const aiNodeAnim* pNodeAnim);
+
+	aiMatrix4x4 m_GlobalInverseTransform;
 	std::map<std::string, GLint> m_BoneNameToIndexMap;
 	GLint m_BoneCounter{0};
+	Assimp::Importer Importer;
+	const aiScene* pScene = NULL;
 
 private:
 	void initBuffers();
